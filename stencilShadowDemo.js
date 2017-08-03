@@ -2,12 +2,12 @@
  * WebGL stencil shadow demo
  *
  * Copyright:
- * Arno van der Vegt, 2011  
+ * Arno van der Vegt, 2011
  *
  * Contact:
  * legoasimo@gmail.com
  *
- * Licence:  
+ * Licence:
  * Creative Commons Attribution/Share-Alike license
  * http://creativecommons.org/licenses/by-sa/3.0/
  *
@@ -23,7 +23,7 @@ var pMatrixStack  = [];
 
 function initGL(canvas) {
     try {
-        gl = canvas.getContext('experimental-webgl');
+        gl = canvas.getContext('experimental-webgl', {stencil: 8});
         gl.viewportWidth = canvas.width;
         gl.viewportHeight = canvas.height;
     }
@@ -352,7 +352,7 @@ function createObject(texture) {
 
         // Disable the color attribute, not needed because the object has a texture...
         gl.disableVertexAttribArray(shaderProgram.vertexColorAttribute);
-        
+
         // Set the vertex position buffer...
         gl.bindBuffer(gl.ARRAY_BUFFER, this.glPositionBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.glPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -446,7 +446,7 @@ function createStar(sizeX, sizeY, sizeZ, texture) {
             x1, y1,
             x2, y2,
             x3, y3;
-            
+
         for (i = 0; i < 5; i++) {
             x1 = Math.sin(start +  i        * step) * sizeX * 0.5;
             y1 = Math.cos(start +  i        * step) * sizeY * 0.5;
@@ -461,21 +461,21 @@ function createStar(sizeX, sizeY, sizeZ, texture) {
             v2 = (y2 + sizeY) / (sizeY * 2);
             u3 = (x3 + sizeX) / (sizeX * 2);
             v3 = (y3 + sizeY) / (sizeY * 2);
-            
+
             this.addTriangle(x1, y1, -sizeZ,   u1,v1,
                              x2, y2, -sizeZ,   u2,v2,
                              0,  0,  -sizeZ,   u3,v3);
             this.addTriangle(x2, y2, -sizeZ,   u2,v2,
                              x1, y1, -sizeZ,   u1,v1,
                              x3, y3,  0,       u3,v3);
-            
+
             this.addTriangle(x2, y2,  sizeZ,   u2,v2,
                              x1, y1,  sizeZ,   u1,v1,
                              0,  0,   sizeZ,   0.5,0.5);
             this.addTriangle(x1, y1,  sizeZ,   u1,v1,
                              x2, y2,  sizeZ,   u2,v2,
                              x3, y3,  0,       u3,v3);
-                             
+
             this.addTriangle(x1, y1, -sizeZ,   u1,v1,
                              x1, y1,  sizeZ,   u1,v1,
                              x3, y3,  0,       u3,v3);
@@ -570,19 +570,19 @@ function createShadowBuilder(item) {
         i = triangles.length;
         while (i) {
             i--;
-            
+
             triangle = triangles[i];
             if (triangle.visible) {
                 j = 3;
                 while (j) {
                     j--;
-                    
+
                     // Check if the side...
                     k    = triangle.lines[j];
                     line = lines[k];
                     a    = line.v1 + '_' + line.v2;
                     b    = line.v2 + '_' + line.v1;
-                    
+
                     if (lineSidesHash[a] !== undefined) { // Check the v1 -> v2 direction...
                         // The side already exists, remove it...
                         delete(lineSidesHash[a]);
@@ -609,11 +609,11 @@ function createShadowBuilder(item) {
     that.rotateVectorX = function(vector, angle) {
         var x, y,
             sin, cos;
-        
+
         if (angle === 0) {
             return;
         }
-        
+
         y         = vector[1];
         z         = vector[2];
         sin       = Math.sin(angle);
@@ -621,15 +621,15 @@ function createShadowBuilder(item) {
         vector[1] = y * cos - z * sin;
         vector[2] = y * sin + z * cos;
     };
-    
+
     that.rotateVectorY = function(vector, angle) {
         var x, z,
             sin, cos;
-        
+
         if (angle === 0) {
             return;
         }
-        
+
         x         = vector[0];
         z         = vector[2];
         sin       = Math.sin(angle);
@@ -637,23 +637,23 @@ function createShadowBuilder(item) {
         vector[0] = z * sin + x * cos;
         vector[2] = z * cos - x * sin;
     };
-    
+
     that.rotateVectorZ = function(vector, angle) {
         var x, y,
             sin, cos;
-        
+
         if (angle === 0) {
             return;
         }
-        
+
         x         = vector[0];
-        y         = vector[1];            
+        y         = vector[1];
         sin       = Math.sin(angle);
         cos       = Math.cos(angle);
         vector[0] = x * cos - y * sin;
         vector[1] = x * sin + y * cos;
     };
-    
+
     /**
      * Update the shadow...
     **/
@@ -664,12 +664,12 @@ function createShadowBuilder(item) {
             x, y, z;
 
         // Instead of rotating the object to face the light at the
-        // right angle it's a lot faster to rotate the light in the 
+        // right angle it's a lot faster to rotate the light in the
         // reverse direction...
         this.rotateVectorX(vector, -lightAngle[0]);
         this.rotateVectorY(vector, -lightAngle[1]);
         this.rotateVectorZ(vector, -lightAngle[2]);
-        
+
         // Store the location for later use...
         this.lightLocation = vector;
 
@@ -726,7 +726,7 @@ function createShadowBuilder(item) {
                     j--;
                     this.addGLVertex(vertices[triangle.vertices[j]]);
                 }
-                
+
                 // Add the bottom...
                 j = 0;
                 while (j < 3) {
@@ -770,22 +770,22 @@ function createShadowBuilder(item) {
         gl.disableVertexAttribArray(shaderProgram.vertexColorAttribute);
 
         // Render both front and back facing polygons with different stencil operations...
-        gl.disable(gl.CULL_FACE);                 
+        gl.disable(gl.CULL_FACE);
         gl.enable(gl.STENCIL_TEST);
         gl.depthFunc(gl.LESS);
 
         // Disable rendering to the color buffer...
-        gl.colorMask(false, false, false, false); 
+        gl.colorMask(false, false, false, false);
         // Disable z buffer updating...
-        gl.depthMask(false);                      
+        gl.depthMask(false);
         // Allow all bits in the stencil buffer...
-        gl.stencilMask(255);                      
+        gl.stencilMask(255);
 
         // Increase the stencil buffer for back facing polygons, set the z pass opperator
-        gl.stencilOpSeparate(gl.BACK,  gl.KEEP, gl.KEEP, gl.INCR); 
+        gl.stencilOpSeparate(gl.BACK,  gl.KEEP, gl.KEEP, gl.INCR);
         // Decrease the stencil buffer for front facing polygons, set the z pass opperator
-        gl.stencilOpSeparate(gl.FRONT, gl.KEEP, gl.KEEP, gl.DECR); 
-        
+        gl.stencilOpSeparate(gl.FRONT, gl.KEEP, gl.KEEP, gl.DECR);
+
         // Always pass...
         gl.stencilFunc(gl.ALWAYS, 0, 255);
         gl.drawElements(gl.TRIANGLES, this.glVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
@@ -814,13 +814,13 @@ function createShadowOverlay() {
     **/
     that.init = function() {
         var size       = 200,
-            glVertices = [0,                0,                 0,     
-                          gl.viewportWidth, 0,                 0,     
-                          gl.viewportWidth, gl.viewportHeight, 0,    
+            glVertices = [0,                0,                 0,
+                          gl.viewportWidth, 0,                 0,
+                          gl.viewportWidth, gl.viewportHeight, 0,
                           0,                gl.viewportHeight, 0],
             glIndices  = [0, 1, 2,  2, 3, 0],
             glColors   = [0, 0, 0, 1,  0, 0, 0, 1,  0, 0, 0, 1,  0, 0, 0, 1];
-        
+
         // Create a rectangle...
         this.glPositionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.glPositionBuffer);
@@ -844,7 +844,7 @@ function createShadowOverlay() {
     **/
     that.render = function() {
         var stencil;
-        
+
         mvPushMatrix();
             gl.disable(gl.DEPTH_TEST);               // No depth test...
             gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP); // Don't change the stencil buffer...
@@ -858,13 +858,13 @@ function createShadowOverlay() {
 
             // The stencil buffer contains the shadow values...
             gl.enable(gl.STENCIL_TEST);
-            
+
             // Enable blending...
             gl.blendFunc(gl.ONE, gl.SRC_ALPHA);
             gl.enable(gl.BLEND);
 
             // Enable color...
-            gl.uniform1i(shaderProgram.useColorUniform, 1);        
+            gl.uniform1i(shaderProgram.useColorUniform, 1);
             // Disable lighting...
             gl.uniform1i(shaderProgram.useLightingUniform, 0);
 
@@ -872,7 +872,7 @@ function createShadowOverlay() {
             pPushMatrix();
                 pMatrix  = mat4.ortho(0, gl.viewportWidth, gl.viewportHeight, 0, 0, -100);
                 mvMatrix = mat4.identity(mat4.create());
-                
+
                 // Set the buffers...
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.glPositionBuffer);
                 gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.glPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -881,13 +881,13 @@ function createShadowOverlay() {
 
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.glIndexBuffer);
                 setMatrixUniforms();
-                
+
                 // Render 3 passes, each pas with a darker alpha value...
                 stencil = 128;
                 while (stencil < 132) {
                     stencil++;
-                    
-                    // The stencil value controls the darkness, 
+
+                    // The stencil value controls the darkness,
                     // with each shadow the stencil buffer is increased.
                     // When more shadows overlap the shadow gets darker.
                     gl.stencilFunc(gl.EQUAL, stencil, 255);
@@ -900,7 +900,7 @@ function createShadowOverlay() {
                 gl.depthMask(true); // Enable depth buffer updates again...
 
                 gl.disable(gl.BLEND);
-                gl.disable(gl.STENCIL_TEST);            
+                gl.disable(gl.STENCIL_TEST);
             pPopMatrix();
         mvPopMatrix();
     };
@@ -914,42 +914,42 @@ function createShadowOverlay() {
 
 function createLight() {
     var that = function() {};
-    
+
     that.init = function() {
         // Create a small cube to show the light position...
         this.cube = createCube(0.2, 0.2, 0.2, createTexture('#FFFFFF', '#FFDD00'));
     };
-    
+
     /**
      * Update the light source position, render a cube to show the position...
     **/
     that.update = function(angle) {
-        this.location = vec3.create([     Math.sin(angle)       * 6, 
-                                     18 + Math.cos(angle * 0.5) * 4, 
+        this.location = vec3.create([     Math.sin(angle)       * 6,
+                                     18 + Math.cos(angle * 0.5) * 4,
                                           Math.cos(angle * 0.8) * 9]);
-                
+
         mvPushMatrix();
             // Move to the light position...
             mat4.translate(mvMatrix, this.location);
-            
+
             gl.stencilFunc(gl.NEVER, 0, 255);
 
             // Set alpha, disable lighting...
             gl.uniform1f(shaderProgram.alphaUniform,       1);
             gl.uniform1i(shaderProgram.useLightingUniform, 0);
-            
+
             // Render the cube...
             this.cube.render();
 
             // Set the light position, color and the ambient color...
-            gl.uniform3f(shaderProgram.lightingLocationUniform, mvMatrix[12], mvMatrix[13], mvMatrix[14]);            
+            gl.uniform3f(shaderProgram.lightingLocationUniform, mvMatrix[12], mvMatrix[13], mvMatrix[14]);
             gl.uniform3f(shaderProgram.lightingColorUniform, 0.5, 0.5, 0.5);
             gl.uniform3f(shaderProgram.ambientColorUniform,  0.5, 0.5, 0.5);
         mvPopMatrix();
     };
-    
+
     that.init();
-    
+
     return that;
 }
 
@@ -977,19 +977,19 @@ function createDemo() {
         this.addShape(createCube   (1.5, 1.5, 1.5, createTexture('#00EE00', '#FF0000')), true);
         this.addShape(createStar   (2,   2,   0.5, createTexture('#FFDD00', '#EE6600')), true);
         this.addShape(createPyramid(1.5, 1.5, 1.5, createTexture('#00FFDD', '#EE00FF')), true);
-        
+
         // Create the objects on the floor in black and white...
         this.addShape(createCube   (2, 1, 2, createTexture('#FFFFFF', '#000000')), true);
         this.addShape(createPyramid(2, 2, 2, createTexture('#FFFFFF', '#000000')), true);
-        
+
         // Create an instance of the floor...
         this.shapeInstances.push({shape:0, location:[ 0, -8,  0], angle:[0, 0, 0]});
-        
+
         // Create instances of the rotating objects...
         this.shapeInstances.push({shape:1, location:[-4,  5,  0], angle:[0, 0, 0]});
         this.shapeInstances.push({shape:2, location:[ 0,  1,  0], angle:[0, 0, 0]});
         this.shapeInstances.push({shape:3, location:[ 4, -3,  0], angle:[0, 0, 0]});
-        
+
         // Create instances for the objects on the floor...
         this.shapeInstances.push({shape:4, location:[-8, -6,  8], angle:[0, 0, 0]});
         this.shapeInstances.push({shape:4, location:[ 8, -6, -8], angle:[0, 0, 0]});
@@ -1020,7 +1020,7 @@ function createDemo() {
             mat4.rotateZ(mvMatrix, shapeInstance.angle[2]);
         }
     };
-    
+
     /**
      * Render all objects and their shadows...
     **/
@@ -1037,15 +1037,15 @@ function createDemo() {
 
         mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
         mat4.identity(mvMatrix);
-        
-        mat4.translate(mvMatrix, [0, 0, -zoom]);        
+
+        mat4.translate(mvMatrix, [0, 0, -zoom]);
         mat4.rotateX(mvMatrix, degToRad(20));
         mat4.rotateY(mvMatrix, degToRad(-this.cubeAngle * 0.5));
 
         this.light.update(this.shadowAngle);
-        
+
         gl.uniform1i(shaderProgram.useLightingUniform, 1);
-        
+
         // Render all objects...
         i = shapeInstances.length;
         while (i) {
@@ -1082,15 +1082,15 @@ function createDemo() {
     **/
     that.update = function(elapsed) {
         var shapeInstances = this.shapeInstances;
-        
+
         this.cubeAngle   += 0.03  * elapsed;
         this.shadowAngle += 0.001 * elapsed;
-        
+
         shapeInstances[1].angle[1] += 0.0006 * elapsed;
-        shapeInstances[1].angle[2] += 0.0005 * elapsed;        
+        shapeInstances[1].angle[2] += 0.0005 * elapsed;
         shapeInstances[2].angle[1] -= 0.0004 * elapsed;
         shapeInstances[3].angle[0] += 0.0003 * elapsed;
-        shapeInstances[3].angle[1] -= 0.0005 * elapsed;                    
+        shapeInstances[3].angle[1] -= 0.0005 * elapsed;
     };
 
     that.init();
