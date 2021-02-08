@@ -1,0 +1,21 @@
+{
+  "files": [
+    "src/general.ts",
+    "src/GlRenderer.ts",
+    "src/GlShadowOverlay.ts",
+    "src/GlShadowBuilder.ts",
+    "src/GlObject.ts",
+    "src/GlShape.ts",
+    "src/objects/GlCube.ts",
+    "src/objects/GlPyramid.ts",
+    "src/objects/GlStar.ts",
+    "src/GlLight.ts",
+    "src/stencilShadowDemo.ts"
+  ],
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "CommonJS",
+    "outDir": "./dist",
+    "rootDir": "./src"
+  }
+}
