@@ -1,109 +1,57 @@
 <html>
 
 <head>
+    <style>
+        body, html {
+            padding:  0;
+            margin:   0;
+        }
+        div {
+            position: absolute;
+            left:     0;
+            top:      0;
+            width:    100%;
+            height:   100%;
+        }
+        canvas {
+            float:    left;
+            left:     0;
+            top:      0;
+            width:    100%;
+            height:   100%;
+        }
+    </style>
     <!--
         WebGL stencil shadow demo
 
         Copyright:
-        Arno van der Vegt, 2011  
+        Arno van der Vegt, 2011
 
         Contact:
         legoasimo@gmail.com
 
-        Licence:  
+        Licence:
         Creative Commons Attribution/Share-Alike license
         http://creativecommons.org/licenses/by-sa/3.0/
 
         The WebGL setup code was provided by: http://learningwebgl.com
     -->
     <title>Stencil shadow demo</title>
-    <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
-    <script type="text/javascript" src="webgl-utils.js"></script>
-    <script type="text/javascript" src="stencilShadowDemo.js"></script>
-
-    <script id="shader-fs" type="x-shader/x-fragment">
-        #ifdef GL_ES
-        precision highp float;
-        #endif
-
-        varying vec2 vTextureCoord;
-        varying vec3 vLightWeighting;
-        varying vec4 vColor;
-
-        uniform sampler2D uSampler;
-        uniform bool uUseLighting;
-        uniform bool uUseColor;
-        uniform float uAlpha;
-
-        void main(void) {
-            if (!uUseColor) {
-                vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-                if (!uUseLighting) {
-                    gl_FragColor = vec4(textureColor.rgb, textureColor.a);
-                }
-                else {
-                    gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
-                }
-            }
-            else {
-                gl_FragColor = vColor * uAlpha;
-            }
-        }
-    </script>
-
-    <script id="shader-vs" type="x-shader/x-vertex">
-        attribute vec3 aVertexPosition;
-        attribute vec3 aVertexNormal;
-        attribute vec2 aTextureCoord;
-
-        uniform mat4 uMVMatrix;
-        uniform mat4 uPMatrix;
-        uniform mat3 uNMatrix;
-
-        uniform vec3 uAmbientColor;
-
-        uniform vec3 uLightingLocation;
-        uniform vec3 uLightingColor;
-
-        uniform bool uUseLighting;
-        uniform bool uUseColor;
-
-        varying vec2 vTextureCoord;
-        varying vec3 vLightWeighting;
-
-        varying vec4 vColor;
-
-        attribute vec4 aVertexColor;
-
-        void main(void) {
-            if (!uUseColor) {
-                vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
-                gl_Position = uPMatrix * mvPosition;
-                vTextureCoord = aTextureCoord;
-
-                if (!uUseLighting) {
-                    vLightWeighting = vec3(0.4, 0.4, 0.4);
-                }
-                else {
-                    vec3 lightDirection = normalize(uLightingLocation - mvPosition.xyz);
-
-                    vec3 transformedNormal = uNMatrix * aVertexNormal;
-                    float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);
-                    vLightWeighting = uAmbientColor + uLightingColor * directionalLightWeighting;
-                }
-            }
-            else {
-                gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-                vColor = aVertexColor;
-            }
-        }
-    </script>
+    <script type="text/javascript" src="dist/general.js"></script>
+    <script type="text/javascript" src="dist/glMatrix.js"></script>
+    <script type="text/javascript" src="dist/webgl-utils.js"></script>
+    <script type="text/javascript" src="dist/GlObject.js"></script>
+    <script type="text/javascript" src="dist/GlShape.js"></script>
+    <script type="text/javascript" src="dist/objects/GlCube.js"></script>
+    <script type="text/javascript" src="dist/objects/GlPyramid.js"></script>
+    <script type="text/javascript" src="dist/objects/GlStar.js"></script>
+    <script type="text/javascript" src="dist/GlLight.js"></script>
+    <script type="text/javascript" src="dist/GlRenderer.js"></script>
+    <script type="text/javascript" src="dist/GlShadowBuilder.js"></script>
+    <script type="text/javascript" src="dist/GlShadowOverlay.js"></script>
+    <script type="text/javascript" src="dist/stencilShadowDemo.js"></script>
 </head>
 
-<body onload="webGLStart();">
-    <div style="float:left;margin:20px;margin-top:20px;width:100%;">
-        <canvas id="demoCanvas" style="border:none;" width="400" height="400"></canvas>
-    </div>
-</body>
+<body><div><canvas id="demoCanvas" width="1024" height="768"></canvas></div></body>
 
 </html>
