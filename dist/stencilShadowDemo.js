@@ -79,7 +79,7 @@ class Demo {
      * Add a shape to the list, check if a shadow builder is needed...
     **/
     addShape(shape, shadow) {
-        shape.setShadow(shadow ? new GlShadowBuilder({ item: shape, renderer: this._renderer }) : null);
+        shape.setShadow(shadow ? new GlShadowBuilder({ object: shape, renderer: this._renderer }) : null);
         this._shadowBuilderList.push(shape);
     }
     ;

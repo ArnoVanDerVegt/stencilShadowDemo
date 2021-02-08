@@ -1,44 +1,51 @@
 interface IGlShadowBuilder {
     _renderer:            IGlRenderer;
     _lineSides:           IAnyList;
-    _item:                any;
+    _object:              IGlObject;
     _glPositionBuffer:    IGlBuffer;
     _glVertexIndexBuffer: IGlBuffer;
     _glVertices:          INumberList;
     _glIndices:           INumberList;
     _lightLocation:       INumberList;
-    setupData(): void;
-    addGLVertex(vector: INumberList): void;
+    setupData(): IGlShadowBuilder;
+    addGLVertex(vector: INumberList): IGlShadowBuilder;
     addShadowSide(vector1: INumberList, vector2: INumberList, vector3: INumberList, vector4: INumberList): void;
-    checkDirection(lightLocation: INumberList): void;
+    checkDirection(lightLocation: INumberList): IGlShadowBuilder;
     findEdge(): void;
-    rotateVectorX(vector: INumberList, angle: number): void;
-    rotateVectorY(vector: INumberList, angle: number): void;
-    rotateVectorZ(vector: INumberList, angle: number): void;
+    rotateVectorX(vector: INumberList, angle: number): IGlShadowBuilder;
+    rotateVectorY(vector: INumberList, angle: number): IGlShadowBuilder;
+    rotateVectorZ(vector: INumberList, angle: number): IGlShadowBuilder;
     update(lightLocation: INumberList, lightAngle: number, matrix: any, zoom: number): void;
     createVolume(lightLocation: INumberList): void;
     render(): void;
 }
 
+interface GlShadowBuilderOpts {
+    renderer: IGlRenderer;
+    object:   IGlObject;
+}
+
 class GlShadowBuilder implements IGlShadowBuilder {
     _renderer:            IGlRenderer;
     _lineSides:           IAnyList;
-    _item:                any;
+    _object:              IGlObject;
     _glPositionBuffer:    IGlBuffer;
     _glVertexIndexBuffer: IGlBuffer;
     _glVertices:          INumberList;
     _glIndices:           INumberList;
     _lightLocation:       INumberList;
 
-    constructor(opts: any) {
+    constructor(opts: GlShadowBuilderOpts) {
         this._renderer            = opts.renderer;
-        this._item                = opts.item;
+        this._object              = opts.object;
         this._lineSides           = [];
         this._glPositionBuffer    = null;
         this._glVertexIndexBuffer = null;
+        this._glVertices          = [];
+        this._glIndices           = [];
     }
 
-    setupData(): void {
+    setupData(): IGlShadowBuilder {
         let gl: IGl = this._renderer.getGl();
         if (this._glPositionBuffer !== null) {
             gl.deleteBuffer(this._glPositionBuffer);
@@ -46,30 +53,32 @@ class GlShadowBuilder implements IGlShadowBuilder {
         if (this._glVertexIndexBuffer !== null) {
             gl.deleteBuffer(this._glVertexIndexBuffer);
         }
-        this._glVertices = [];
-        this._glIndices  = [];
+        this._glVertices.length = 0;
+        this._glIndices.length  = 0;
+        return this;
     };
 
-    addGLVertex(vector: INumberList): void {
+    addGLVertex(vector: INumberList): IGlShadowBuilder {
         this._glVertices.push(vector[0], vector[1], vector[2]);
         this._glIndices.push(this._glIndices.length);
+        return this;
     };
 
     addShadowSide(vector1: INumberList, vector2: INumberList, vector3: INumberList, vector4: INumberList): void {
-        this.addGLVertex(vector1);
-        this.addGLVertex(vector2);
-        this.addGLVertex(vector3);
-
-        this.addGLVertex(vector4);
-        this.addGLVertex(vector3);
-        this.addGLVertex(vector2);
+        this
+            .addGLVertex(vector1)
+            .addGLVertex(vector2)
+            .addGLVertex(vector3)
+            .addGLVertex(vector4)
+            .addGLVertex(vector3)
+            .addGLVertex(vector2);
     };
 
     /**
      * Check which triangles face the light source...
     **/
-    checkDirection(lightLocation: INumberList): void {
-        let triangles = this._item.getTriangles();
+    checkDirection(lightLocation: INumberList): IGlShadowBuilder {
+        let triangles = this._object.getTriangles();
         let triangle;
         let vector;
         let i = triangles.length;
@@ -84,16 +93,17 @@ class GlShadowBuilder implements IGlShadowBuilder {
             // Compare the vector with the normal of the triangle...
             triangle.visible = (vec3.dot(vector, triangle.normal) < 0);
         }
+        return this;
     }
 
     /**
      * Find the edge of the object...
     **/
     findEdge(): void {
-        let triangles     = this._item.getTriangles();
+        let triangles     = this._object.getTriangles();
         let triangle;
         let a, b;
-        let lines         = this._item.getLines();
+        let lines         = this._object.getLines();
         let line;
         let lineSidesHash = {};
         let i, j, k;
@@ -124,7 +134,6 @@ class GlShadowBuilder implements IGlShadowBuilder {
                 }
             }
         }
-
         // Convert the hash map to an array...
         for (i in lineSidesHash) {
             line = lines[lineSidesHash[i]];
@@ -132,9 +141,9 @@ class GlShadowBuilder implements IGlShadowBuilder {
         }
     }
 
-    rotateVectorX(vector: INumberList, angle: number): void {
+    rotateVectorX(vector: INumberList, angle: number): IGlShadowBuilder {
         if (angle === 0) {
-            return;
+            return this;
         }
         let y   = vector[1];
         let z   = vector[2];
@@ -142,11 +151,12 @@ class GlShadowBuilder implements IGlShadowBuilder {
         let cos = Math.cos(angle);
         vector[1] = y * cos - z * sin;
         vector[2] = y * sin + z * cos;
+        return this;
     };
 
-    rotateVectorY(vector: INumberList, angle: number): void {
+    rotateVectorY(vector: INumberList, angle: number): IGlShadowBuilder {
         if (angle === 0) {
-            return;
+            return this;
         }
         let x   = vector[0];
         let z   = vector[2];
@@ -154,11 +164,12 @@ class GlShadowBuilder implements IGlShadowBuilder {
         let cos = Math.cos(angle);
         vector[0] = z * sin + x * cos;
         vector[2] = z * cos - x * sin;
+        return this;
     };
 
-    rotateVectorZ(vector: INumberList, angle: number): void {
+    rotateVectorZ(vector: INumberList, angle: number): IGlShadowBuilder {
         if (angle === 0) {
-            return;
+            return this;
         }
         let x   = vector[0];
         let y   = vector[1];
@@ -166,6 +177,7 @@ class GlShadowBuilder implements IGlShadowBuilder {
         let cos = Math.cos(angle);
         vector[0] = x * cos - y * sin;
         vector[1] = x * sin + y * cos;
+        return this;
     }
 
     /**
@@ -176,19 +188,21 @@ class GlShadowBuilder implements IGlShadowBuilder {
         let sin, cos, x, y, z;
         let vector1 = vec3.fromValues(lightLocation[0], lightLocation[1], lightLocation[2]);
         let vector2 = vec3.fromValues(matrix[12], matrix[13], matrix[14] + zoom);
-        let vector = vec3.create();
+        let vector  = vec3.create();
         vec3.subtract(vector, vector1, vector2);
         // Instead of rotating the object to face the light at the
         // right angle it's a lot faster to rotate the light in the
         // reverse direction...
-        this.rotateVectorX(vector, -lightAngle[0]);
-        this.rotateVectorY(vector, -lightAngle[1]);
-        this.rotateVectorZ(vector, -lightAngle[2]);
+        this
+            .rotateVectorX(vector, -lightAngle[0])
+            .rotateVectorY(vector, -lightAngle[1])
+            .rotateVectorZ(vector, -lightAngle[2]);
         // Store the location for later use...
         this._lightLocation = vector;
-        this.setupData();              // Reset all lists and buffers...
-        this.checkDirection(vector);   // Check which triangles face the light source...
-        this.findEdge();               // Find the edge...
+        this
+            .setupData()               // Reset all lists and buffers...
+            .checkDirection(vector)    // Check which triangles face the light source...
+            .findEdge();               // Find the edge...
     }
 
     /**
@@ -196,8 +210,8 @@ class GlShadowBuilder implements IGlShadowBuilder {
     **/
     createVolume(lightLocation: INumberList): void {
         let gl         = this._renderer.getGl();
-        let vertices   = this._item.getVertices();
-        let triangles  = this._item.getTriangles();
+        let vertices   = this._object.getVertices();
+        let triangles  = this._object.getTriangles();
         let triangle;
         let lineSides  = this._lineSides;
         let vector3    = vec3.create();
@@ -270,7 +284,6 @@ class GlShadowBuilder implements IGlShadowBuilder {
         this.createVolume(this._lightLocation);
         gl.bindBuffer(gl.ARRAY_BUFFER, this._glPositionBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this._glPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._glVertexIndexBuffer);
         this._renderer.setMatrixUniforms();
         // Disable the texture coord attribute...
@@ -279,32 +292,26 @@ class GlShadowBuilder implements IGlShadowBuilder {
         gl.disableVertexAttribArray(shaderProgram.vertexNormalAttribute);
         // Disable the color attribute...
         gl.disableVertexAttribArray(shaderProgram.vertexColorAttribute);
-
         // Render both front and back facing polygons with different stencil operations...
         gl.disable(gl.CULL_FACE);
         gl.enable(gl.STENCIL_TEST);
         gl.depthFunc(gl.LESS);
-
         // Disable rendering to the color buffer...
         gl.colorMask(false, false, false, false);
         // Disable z buffer updating...
         gl.depthMask(false);
         // Allow all bits in the stencil buffer...
         gl.stencilMask(255);
-
         // Increase the stencil buffer for back facing polygons, set the z pass opperator
         gl.stencilOpSeparate(gl.BACK,  gl.KEEP, gl.KEEP, gl.INCR);
         // Decrease the stencil buffer for front facing polygons, set the z pass opperator
         gl.stencilOpSeparate(gl.FRONT, gl.KEEP, gl.KEEP, gl.DECR);
-
         // Always pass...
         gl.stencilFunc(gl.ALWAYS, 0, 255);
         gl.drawElements(gl.TRIANGLES, this._glVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-
         // Enable rendering the the color and depth buffer again...
         gl.colorMask(true, true, true, true);
         gl.depthMask(true);
-
         gl.disable(gl.STENCIL_TEST);
     }
 }

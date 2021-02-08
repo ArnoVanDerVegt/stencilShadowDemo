@@ -79,9 +79,19 @@ const FRAGMENT_SHADER: string = [
         '}'
     ].join('\n');
 
+interface IGlVertices {
+    [index:number]: INumberList;
+    length:         number;
+    push(...args: any[]);
+    pop(): any;
+}
+
 interface IGlBuffer {
     itemSize: number;
     numItems: number;
+}
+
+interface IGlTexture {
 }
 
 interface IGlShaderProgram {
@@ -102,30 +112,35 @@ interface IGlShaderProgram {
 }
 
 interface IGl {
-    ONE:                   number;
-    NEVER:                 number;
-    FLOAT:                 number;
-    DECR:                  number;
-    INCR:                  number;
-    KEEP:                  number;
     ALWAYS:                number;
-    LESS:                  number;
-    LEQUAL:                number;
-    EQUAL:                 number;
-    FRONT:                 number;
+    ARRAY_BUFFER:          number;
     BACK:                  number;
     BLEND:                 number;
-    DEPTH_TEST:            number;
-    SRC_ALPHA:             number;
-    TRIANGLES:             number;
-    UNSIGNED_SHORT:        number;
+    CLAMP_TO_EDGE:         number;
     COLOR_BUFFER_BIT:      number;
-    DEPTH_BUFFER_BIT:      number;
-    STENCIL_BUFFER_BIT:    number;
-    ARRAY_BUFFER:          number;
-    ELEMENT_ARRAY_BUFFER:  number;
-    STATIC_DRAW:           number;
+    COMPILE_STATUS:        number;
     CULL_FACE:             number;
+    DECR:                  number;
+    DEPTH_TEST:            number;
+    DEPTH_BUFFER_BIT:      number;
+    ELEMENT_ARRAY_BUFFER:  number;
+    EQUAL:                 number;
+    FRAGMENT_SHADER:       number;
+    FLOAT:                 number;
+    FRONT:                 number;
+    INCR:                  number;
+    KEEP:                  number;
+    LESS:                  number;
+    LEQUAL:                number;
+    LINEAR_MIPMAP_NEAREST: number;
+    LINEAR:                number;
+    LINK_STATUS:           string;
+    NEVER:                 number;
+    ONE:                   number;
+    RGBA:                  number;
+    SRC_ALPHA:             number;
+    STENCIL_BUFFER_BIT:    number;
+    STATIC_DRAW:           number;
     STENCIL_TEST:          number;
     TEXTURE0:              number;
     TEXTURE_2D:            number;
@@ -133,72 +148,74 @@ interface IGl {
     TEXTURE_MAG_FILTER:    number;
     TEXTURE_WRAP_S:        number;
     TEXTURE_WRAP_T:        number;
-    CLAMP_TO_EDGE:         number;
-    FRAGMENT_SHADER:       number;
-    VERTEX_SHADER:         number;
-    COMPILE_STATUS:        number;
-    LINEAR_MIPMAP_NEAREST: number;
+    TRIANGLES:             number;
+    UNSIGNED_SHORT:        number;
     UNSIGNED_BYTE:         number;
-    RGBA:                  number;
-    LINEAR:                number;
-    LINK_STATUS:           string;
-    stencilFunc(func: number, ref: number, mask: number);
-    enable(index: number);
-    disable(index: number);
-    viewport(x: number, y: number, width: number, height: number);
-    clear(v0: number);
-    clearColor(r: number, g: number, b: number, a: number);
-    clearStencil(v0: number);
-    createBuffer();
-    bindBuffer(target: number, buffer: IGlBuffer);
-    bufferData(target: number, srcData: any, usage: number);
-    deleteBuffer(target: IGlBuffer);
-    vertexAttribPointer(index: number, size: number, type: number, normalized: Boolean, stride: number, offset: number);
-    disableVertexAttribArray(index: number);
-    enableVertexAttribArray(index: number);
-    colorMask(r: Boolean, g: Boolean, b: Boolean, a: Boolean);
-    stencilMask(n: number);
-    depthMask(n: Boolean);
-    depthFunc(n: number);
-    drawElements(mode: number, count: number, type: number, offset: number);
-    stencilOpSeparate(face: number, fail: number, zfail: number, zpass: number);
-    stencilOp(fail: number, zfail: number, zpass: number);
-    blendFunc(sfactor: number, dfactor: number);
-    cullFace(n: number);
-    activeTexture(index: number);
-    bindTexture(index: number, texture: any);
-    uniform1f(location: number, v0: number);
-    uniform1i(location: number, v0: number);
-    uniform3f(location: number, v0: number, v1: number, v2: number);
-    uniformMatrix2fv(location: number, transpose: boolean, value: number);
-    uniformMatrix3fv(location: number, transpose: boolean, value: number);
-    uniformMatrix4fv(location: number, transpose: boolean, value: INumberList);
-    createProgram();
-    getUniformLocation(program: IGlShaderProgram, name: string);
-    getAttribLocation(program: IGlShaderProgram, name: string);
-    getProgramParameter(program: IGlShaderProgram, pname: string);
-    attachShader(program: IGlShaderProgram, shader: any);
-    useProgram(program: IGlShaderProgram);
-    linkProgram(program: IGlShaderProgram);
-    getShaderParameter(shader: IGlShaderProgram, pname: number);
-    shaderSource(shader: IGlShaderProgram, source: string);
+    VERTEX_SHADER:         number;
+    activeTexture(index: number): void;
+    attachShader(program: IGlShaderProgram, shader: any): void;
+    bindBuffer(target: number, buffer: IGlBuffer): void;
+    bindTexture(index: number, texture: IGlTexture): void;
+    blendFunc(sfactor: number, dfactor: number): void;
+    bufferData(target: number, srcData: any, usage: number): void;
+    clear(v0: number): void;
+    clearColor(r: number, g: number, b: number, a: number): void;
+    clearStencil(v0: number): void;
     createShader(type: number): IGlShaderProgram;
-    compileShader(shader: IGlShaderProgram);
-    getShaderInfoLog(shader: IGlShaderProgram);
-    createTexture(): any;
-    texImage2D(target: any, level: any, internalformat: any, format: any, type: any, ImageBitmap: any);
-    texParameteri(target: number, pname: number, param: number);
-    texParameterf(target: number, pname: number, param: number);
-    generateMipmap(target: number);
+    createTexture(): IGlTexture;
+    createBuffer(): IGlBuffer;
+    createProgram(): IGlShaderProgram;
+    compileShader(shader: IGlShaderProgram): void;
+    colorMask(r: Boolean, g: Boolean, b: Boolean, a: Boolean): void;
+    cullFace(n: number): void;
+    depthFunc(n: number): void;
+    depthMask(n: Boolean): void;
+    deleteBuffer(target: IGlBuffer): void;
+    disable(index: number): void;
+    disableVertexAttribArray(index: number): void;
+    drawElements(mode: number, count: number, type: number, offset: number): void;
+    enable(index: number): void;
+    enableVertexAttribArray(index: number): void;
+    generateMipmap(target: number): void;
+    getAttribLocation(program: IGlShaderProgram, name: string): any;
+    getUniformLocation(program: IGlShaderProgram, name: string): any;
+    getProgramParameter(program: IGlShaderProgram, pname: string): number;
+    getShaderParameter(shader: IGlShaderProgram, pname: number): any;
+    getShaderInfoLog(shader: IGlShaderProgram): void;
+    linkProgram(program: IGlShaderProgram): void;
+    stencilFunc(func: number, ref: number, mask: number): void;
+    stencilMask(n: number): void;
+    stencilOpSeparate(face: number, fail: number, zfail: number, zpass: number): void;
+    stencilOp(fail: number, zfail: number, zpass: number): void;
+    shaderSource(shader: IGlShaderProgram, source: string): void;
+    uniform1f(location: number, v0: number): void;
+    uniform1i(location: number, v0: number): void;
+    uniform3f(location: number, v0: number, v1: number, v2: number): void;
+    uniformMatrix2fv(location: number, transpose: boolean, value: number): void;
+    uniformMatrix3fv(location: number, transpose: boolean, value: number): void;
+    uniformMatrix4fv(location: number, transpose: boolean, value: INumberList): void;
+    useProgram(program: IGlShaderProgram): void;
+    vertexAttribPointer(index: number, size: number, type: number, normalized: Boolean, stride: number, offset: number): void;
+    viewport(x: number, y: number, width: number, height: number): void;
+    texImage2D(target: any, level: any, internalformat: any, format: any, type: any, ImageBitmap: any): void;
+    texParameteri(target: number, pname: number, param: number): void;
+    texParameterf(target: number, pname: number, param: number): void;
+}
+
+interface IGlMatrixList {
+    [index:number]: INumberList;
+    length:         number;
+    push(...args: any[]);
+    pop(): INumberList;
 }
 
 interface IGlRenderer {
     _viewportWidth:  number;
     _viewportHeight: number;
     _mvMatrix:       INumberList;
-    _mvMatrixStack:  INumberList;
+    _mvMatrixStack:  IGlMatrixList;
     _pMatrix:        INumberList;
-    _pMatrixStack:   INumberList;
+    _pMatrixStack:   IGlMatrixList;
     _gl:             IGl;
     _shaderProgram:  IGlShaderProgram;
     getGl(): IGl;
@@ -229,9 +246,9 @@ class GlRenderer implements IGlRenderer {
     _viewportWidth:  number;
     _viewportHeight: number;
     _mvMatrix:       INumberList;
-    _mvMatrixStack:  INumberList;
+    _mvMatrixStack:  IGlMatrixList;
     _pMatrix:        INumberList;
-    _pMatrixStack:   INumberList;
+    _pMatrixStack:   IGlMatrixList;
     _gl:             IGl;
     _shaderProgram:  IGlShaderProgram;
 
@@ -258,11 +275,11 @@ class GlRenderer implements IGlRenderer {
         window.addEventListener('resize', this.onResize.bind(this));
     }
 
-    getGl() {
+    getGl(): IGl {
         return this._gl;
     }
 
-    getMvMatrix() {
+    getMvMatrix(): INumberList {
         return this._mvMatrix;
     }
 
@@ -393,7 +410,7 @@ class GlRenderer implements IGlRenderer {
         this._pMatrix = this._pMatrixStack.pop();
     }
 
-    onResize() {
+    onResize(): void {
         this._screenWidth  = window.innerWidth;
         this._screenHeight = window.innerHeight;
     }

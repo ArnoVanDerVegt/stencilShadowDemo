@@ -1,10 +1,12 @@
 class GlShadowBuilder {
     constructor(opts) {
         this._renderer = opts.renderer;
-        this._item = opts.item;
+        this._object = opts.object;
         this._lineSides = [];
         this._glPositionBuffer = null;
         this._glVertexIndexBuffer = null;
+        this._glVertices = [];
+        this._glIndices = [];
     }
     setupData() {
         let gl = this._renderer.getGl();
@@ -14,29 +16,32 @@ class GlShadowBuilder {
         if (this._glVertexIndexBuffer !== null) {
             gl.deleteBuffer(this._glVertexIndexBuffer);
         }
-        this._glVertices = [];
-        this._glIndices = [];
+        this._glVertices.length = 0;
+        this._glIndices.length = 0;
+        return this;
     }
     ;
     addGLVertex(vector) {
         this._glVertices.push(vector[0], vector[1], vector[2]);
         this._glIndices.push(this._glIndices.length);
+        return this;
     }
     ;
     addShadowSide(vector1, vector2, vector3, vector4) {
-        this.addGLVertex(vector1);
-        this.addGLVertex(vector2);
-        this.addGLVertex(vector3);
-        this.addGLVertex(vector4);
-        this.addGLVertex(vector3);
-        this.addGLVertex(vector2);
+        this
+            .addGLVertex(vector1)
+            .addGLVertex(vector2)
+            .addGLVertex(vector3)
+            .addGLVertex(vector4)
+            .addGLVertex(vector3)
+            .addGLVertex(vector2);
     }
     ;
     /**
      * Check which triangles face the light source...
     **/
     checkDirection(lightLocation) {
-        let triangles = this._item.getTriangles();
+        let triangles = this._object.getTriangles();
         let triangle;
         let vector;
         let i = triangles.length;
@@ -51,15 +56,16 @@ class GlShadowBuilder {
             // Compare the vector with the normal of the triangle...
             triangle.visible = (vec3.dot(vector, triangle.normal) < 0);
         }
+        return this;
     }
     /**
      * Find the edge of the object...
     **/
     findEdge() {
-        let triangles = this._item.getTriangles();
+        let triangles = this._object.getTriangles();
         let triangle;
         let a, b;
-        let lines = this._item.getLines();
+        let lines = this._object.getLines();
         let line;
         let lineSidesHash = {};
         let i, j, k;
@@ -100,7 +106,7 @@ class GlShadowBuilder {
     }
     rotateVectorX(vector, angle) {
         if (angle === 0) {
-            return;
+            return this;
         }
         let y = vector[1];
         let z = vector[2];
@@ -108,11 +114,12 @@ class GlShadowBuilder {
         let cos = Math.cos(angle);
         vector[1] = y * cos - z * sin;
         vector[2] = y * sin + z * cos;
+        return this;
     }
     ;
     rotateVectorY(vector, angle) {
         if (angle === 0) {
-            return;
+            return this;
         }
         let x = vector[0];
         let z = vector[2];
@@ -120,11 +127,12 @@ class GlShadowBuilder {
         let cos = Math.cos(angle);
         vector[0] = z * sin + x * cos;
         vector[2] = z * cos - x * sin;
+        return this;
     }
     ;
     rotateVectorZ(vector, angle) {
         if (angle === 0) {
-            return;
+            return this;
         }
         let x = vector[0];
         let y = vector[1];
@@ -132,6 +140,7 @@ class GlShadowBuilder {
         let cos = Math.cos(angle);
         vector[0] = x * cos - y * sin;
         vector[1] = x * sin + y * cos;
+        return this;
     }
     /**
      * Update the shadow...
@@ -146,22 +155,24 @@ class GlShadowBuilder {
         // Instead of rotating the object to face the light at the
         // right angle it's a lot faster to rotate the light in the
         // reverse direction...
-        this.rotateVectorX(vector, -lightAngle[0]);
-        this.rotateVectorY(vector, -lightAngle[1]);
-        this.rotateVectorZ(vector, -lightAngle[2]);
+        this
+            .rotateVectorX(vector, -lightAngle[0])
+            .rotateVectorY(vector, -lightAngle[1])
+            .rotateVectorZ(vector, -lightAngle[2]);
         // Store the location for later use...
         this._lightLocation = vector;
-        this.setupData(); // Reset all lists and buffers...
-        this.checkDirection(vector); // Check which triangles face the light source...
-        this.findEdge(); // Find the edge...
+        this
+            .setupData() // Reset all lists and buffers...
+            .checkDirection(vector) // Check which triangles face the light source...
+            .findEdge(); // Find the edge...
     }
     /**
      * Create the buffers for the shadow volume...
     **/
     createVolume(lightLocation) {
         let gl = this._renderer.getGl();
-        let vertices = this._item.getVertices();
-        let triangles = this._item.getTriangles();
+        let vertices = this._object.getVertices();
+        let triangles = this._object.getTriangles();
         let triangle;
         let lineSides = this._lineSides;
         let vector3 = vec3.create();

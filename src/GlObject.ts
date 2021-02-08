@@ -7,7 +7,7 @@ interface IRenderer {
 }
 
 interface IGlObject {
-    _vertices:             INumberList;     // List of unique vertices of the object
+    _vertices:             IGlVertices;     // List of unique vertices of the object
     _verticesHash:         INumberHashMap;  // Hash list of vertices
     _lines:                INumberList;     // List of lines in both directions...
     _linesUnique:          INumberList;     // A list of unique lines
@@ -32,7 +32,7 @@ interface IGlObject {
                 x2: number, y2: number, z2: number, uu2: number, vv2: number,
                 x3: number, y3: number, z3: number, uu3: number, vv3: number): IGlObject;
     createBuffers(): void;
-    getVertices(): INumberList;
+    getVertices(): IGlVertices;
     getLines(): INumberList;
     getTriangles(): INumberList;
 }
@@ -43,7 +43,7 @@ interface IGlObjectOpts {
 }
 
 class GlObject implements IGlObject {
-    _vertices:             INumberList;     // List of unique vertices of the object
+    _vertices:             IGlVertices;     // List of unique vertices of the object
     _verticesHash:         INumberHashMap;  // Hash list of vertices
     _lines:                INumberList;     // List of lines in both directions...
     _linesUnique:          INumberList;     // A list of unique lines
@@ -183,7 +183,7 @@ class GlObject implements IGlObject {
     /**
      * Create gl buffers for the object...
     **/
-    createBuffers() {
+    createBuffers(): void {
         let gl = this._renderer.getGl();
         this._glPositionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this._glPositionBuffer);
@@ -210,7 +210,7 @@ class GlObject implements IGlObject {
     /**
      * Render the object...
     **/
-    render() {
+    render(): void {
         let gl:            IGl              = this._renderer.getGl();
         let shaderProgram: IGlShaderProgram = this._renderer.getShaderProgram();
 
@@ -251,7 +251,7 @@ class GlObject implements IGlObject {
         gl.drawElements(gl.TRIANGLES, this._glVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
     }
 
-    getVertices(): INumberList {
+    getVertices(): IGlVertices {
         return this._vertices;
     }
 
