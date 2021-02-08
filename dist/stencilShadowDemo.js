@@ -112,7 +112,7 @@ class Demo {
         let shapeInstance;
         let shape;
         let shadow;
-        let zoom = 60;
+        let zoom = 40;
         let i;
         gl.viewport(0, 0, renderer.getViewportWidth(), renderer.getViewportHeight());
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
