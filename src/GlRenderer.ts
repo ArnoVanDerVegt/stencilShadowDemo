@@ -1,7 +1,7 @@
 declare var mat3: any;
 declare var mat4: any;
 
-const VERTEX_SHADER: string = [
+const FRAGMENT_SHADER: string = [
         '#ifdef GL_ES',
         'precision highp float;',
         '#endif',
@@ -31,7 +31,7 @@ const VERTEX_SHADER: string = [
         '}'
     ].join('\n');
 
-const FRAGMENT_SHADER: string = [
+const VERTEX_SHADER: string = [
         'attribute vec3 aVertexPosition;',
         'attribute vec3 aVertexNormal;',
         'attribute vec2 aTextureCoord;',
@@ -326,8 +326,8 @@ class GlRenderer implements IGlRenderer {
 
     initShaders(): void {
         let gl             = this._gl;
-        let fragmentShader = this.getShader('fragment', VERTEX_SHADER);
-        let vertexShader   = this.getShader('vertex', FRAGMENT_SHADER);
+        let fragmentShader = this.getShader('fragment',FRAGMENT_SHADER);
+        let vertexShader   = this.getShader('vertex', VERTEX_SHADER);
         let shaderProgram  = gl.createProgram();
         this._shaderProgram = shaderProgram;
         gl.attachShader(shaderProgram, vertexShader);

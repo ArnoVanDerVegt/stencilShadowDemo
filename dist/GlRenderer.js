@@ -1,4 +1,4 @@
-const VERTEX_SHADER = [
+const FRAGMENT_SHADER = [
     '#ifdef GL_ES',
     'precision highp float;',
     '#endif',
@@ -27,7 +27,7 @@ const VERTEX_SHADER = [
     '    }',
     '}'
 ].join('\n');
-const FRAGMENT_SHADER = [
+const VERTEX_SHADER = [
     'attribute vec3 aVertexPosition;',
     'attribute vec3 aVertexNormal;',
     'attribute vec2 aTextureCoord;',
@@ -136,8 +136,8 @@ class GlRenderer {
     }
     initShaders() {
         let gl = this._gl;
-        let fragmentShader = this.getShader('fragment', VERTEX_SHADER);
-        let vertexShader = this.getShader('vertex', FRAGMENT_SHADER);
+        let fragmentShader = this.getShader('fragment', FRAGMENT_SHADER);
+        let vertexShader = this.getShader('vertex', VERTEX_SHADER);
         let shaderProgram = gl.createProgram();
         this._shaderProgram = shaderProgram;
         gl.attachShader(shaderProgram, vertexShader);
