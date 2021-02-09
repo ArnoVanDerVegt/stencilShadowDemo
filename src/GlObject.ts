@@ -1,18 +1,12 @@
 declare var vec3: any;
 
-interface IRenderer {
-    getGl():             IGl;
-    getShaderProgram():  IGlShaderProgram;
-    setMatrixUniforms(): void;
-}
-
 interface IGlObject {
     _vertices:             IGlVertices;     // List of unique vertices of the object
     _verticesHash:         INumberHashMap;  // Hash list of vertices
     _lines:                INumberList;     // List of lines in both directions...
     _linesUnique:          INumberList;     // A list of unique lines
     _triangles:            INumberList;     // Triangles in the object
-    _renderer:             IRenderer;
+    _renderer:             IGlRenderer;
     _texture:              unknown;
     _glVertexCount:        number;          // The active vertex index
     _glVertices:           INumberList;     // Vertex position list for gl
@@ -38,7 +32,7 @@ interface IGlObject {
 }
 
 interface IGlObjectOpts {
-    renderer: IRenderer;
+    renderer: IGlRenderer;
     texture:  unknown;
 }
 
@@ -48,7 +42,7 @@ class GlObject implements IGlObject {
     _lines:                INumberList;     // List of lines in both directions...
     _linesUnique:          INumberList;     // A list of unique lines
     _triangles:            INumberList;     // Triangles in the object
-    _renderer:             IRenderer;
+    _renderer:             IGlRenderer;
     _texture:              unknown;
     _glVertexCount:        number;          // The active vertex index
     _glVertices:           INumberList;     // Vertex position list for gl
@@ -211,8 +205,9 @@ class GlObject implements IGlObject {
      * Render the object...
     **/
     render(): void {
-        let gl:            IGl              = this._renderer.getGl();
-        let shaderProgram: IGlShaderProgram = this._renderer.getShaderProgram();
+        let renderer:      IGlRenderer      = this._renderer;
+        let gl:            IGl              = renderer.getGl();
+        let shaderProgram: IGlShaderProgram = renderer.getShaderProgram();
 
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
@@ -240,10 +235,10 @@ class GlObject implements IGlObject {
         // Set the texture...
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this._texture);
-        gl.uniform1i(shaderProgram.samplerUniform, 0);
+        gl.uniform1i(renderer.getSamplerUniform(), 0);
 
         // Don't use the color attribute...
-        gl.uniform1i(shaderProgram.useColorUniform, 0);
+        gl.uniform1i(renderer.getUseColorUniform(), 0);
 
         // Set the index, render the triangles...
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._glVertexIndexBuffer);

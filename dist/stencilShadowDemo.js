@@ -122,7 +122,7 @@ class Demo {
         mat4.rotateX(mvMatrix, mvMatrix, 0.4);
         mat4.rotateY(mvMatrix, mvMatrix, -this._cubeAngle * 0.01);
         this._light.update(this._shadowAngle);
-        gl.uniform1i(shaderProgram.useLightingUniform, 1);
+        gl.uniform1i(renderer.getUseLightingUniform(), 1);
         // Render all objects...
         i = shapeInstances.length;
         while (i) {

@@ -155,16 +155,16 @@ class GlRenderer {
         gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
         shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, 'aVertexColor');
         gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
-        shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, 'uPMatrix');
-        shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, 'uMVMatrix');
-        shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, 'uNMatrix');
-        shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, 'uSampler');
-        shaderProgram.useLightingUniform = gl.getUniformLocation(shaderProgram, 'uUseLighting');
-        shaderProgram.useColorUniform = gl.getUniformLocation(shaderProgram, 'uUseColor');
-        shaderProgram.alphaUniform = gl.getUniformLocation(shaderProgram, 'uAlpha');
-        shaderProgram.ambientColorUniform = gl.getUniformLocation(shaderProgram, 'uAmbientColor');
-        shaderProgram.lightingLocationUniform = gl.getUniformLocation(shaderProgram, 'uLightingLocation');
-        shaderProgram.lightingColorUniform = gl.getUniformLocation(shaderProgram, 'uLightingColor');
+        this._pMatrixUniform = gl.getUniformLocation(shaderProgram, 'uPMatrix');
+        this._mvMatrixUniform = gl.getUniformLocation(shaderProgram, 'uMVMatrix');
+        this._nMatrixUniform = gl.getUniformLocation(shaderProgram, 'uNMatrix');
+        this._samplerUniform = gl.getUniformLocation(shaderProgram, 'uSampler');
+        this._useLightingUniform = gl.getUniformLocation(shaderProgram, 'uUseLighting');
+        this._useColorUniform = gl.getUniformLocation(shaderProgram, 'uUseColor');
+        this._alphaUniform = gl.getUniformLocation(shaderProgram, 'uAlpha');
+        this._ambientColorUniform = gl.getUniformLocation(shaderProgram, 'uAmbientColor');
+        this._lightingLocationUniform = gl.getUniformLocation(shaderProgram, 'uLightingLocation');
+        this._lightingColorUniform = gl.getUniformLocation(shaderProgram, 'uLightingColor');
     }
     getShader(type, source) {
         let gl = this._gl;
@@ -189,13 +189,34 @@ class GlRenderer {
     setMatrixUniforms() {
         let gl = this._gl;
         let shaderProgram = this._shaderProgram;
-        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, this._pMatrix);
-        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, this._mvMatrix);
+        gl.uniformMatrix4fv(this._pMatrixUniform, false, this._pMatrix);
+        gl.uniformMatrix4fv(this._mvMatrixUniform, false, this._mvMatrix);
         var normalMatrix = mat3.create();
         mat3.fromMat4(normalMatrix, this._mvMatrix);
         mat3.invert(normalMatrix, normalMatrix);
         mat3.transpose(normalMatrix, normalMatrix);
-        gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
+        gl.uniformMatrix3fv(this._nMatrixUniform, false, normalMatrix);
+    }
+    getAlphaUniform() {
+        return this._alphaUniform;
+    }
+    getUseColorUniform() {
+        return this._useColorUniform;
+    }
+    getUseLightingUniform() {
+        return this._useLightingUniform;
+    }
+    getLightingLocationUniform() {
+        return this._lightingLocationUniform;
+    }
+    getLightingColorUniform() {
+        return this._lightingColorUniform;
+    }
+    getAmbientColorUniform() {
+        return this._ambientColorUniform;
+    }
+    getSamplerUniform() {
+        return this._samplerUniform;
     }
     mvPushMatrix() {
         this._mvMatrixStack.push(mat4.clone(this._mvMatrix));

@@ -69,9 +69,9 @@ class GlShadowOverlay implements IGlShadowOverlay {
             gl.blendFunc(gl.ONE, gl.SRC_ALPHA);
             gl.enable(gl.BLEND);
             // Enable color...
-            gl.uniform1i(shaderProgram.useColorUniform, 1);
+            gl.uniform1i(renderer.getUseColorUniform(), 1);
             // Disable lighting...
-            gl.uniform1i(shaderProgram.useLightingUniform, 0);
+            gl.uniform1i(renderer.getUseLightingUniform(), 0);
             // Render 2D...
             renderer.pPushMatrix();
                 mat4.ortho(renderer.getPMatrix(), 0, renderer.getViewportWidth(), renderer.getViewportHeight(), 0, 0, -100);
@@ -94,7 +94,7 @@ class GlShadowOverlay implements IGlShadowOverlay {
                     // with each shadow the stencil buffer is increased.
                     // When more shadows overlap the shadow gets darker.
                     gl.stencilFunc(gl.EQUAL, stencil, 255);
-                    gl.uniform1f(shaderProgram.alphaUniform, 0.8 - (stencil - 129) * 0.1);
+                    gl.uniform1f(renderer.getAlphaUniform(), 0.8 - (stencil - 129) * 0.1);
                     // Render the rectangle...
                     gl.drawElements(gl.TRIANGLES, this._glIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
                 }

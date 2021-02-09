@@ -38,14 +38,14 @@ class GlLight implements IGlLight {
             renderer.setMvMatrix(mvMatrix);
             gl.stencilFunc(gl.NEVER, 0, 255);
             // Set alpha, disable lighting...
-            gl.uniform1f(shaderProgram.alphaUniform,       1);
-            gl.uniform1i(shaderProgram.useLightingUniform, 0);
+            gl.uniform1f(renderer.getAlphaUniform(),       1);
+            gl.uniform1i(renderer.getUseLightingUniform(), 0);
             // Render the cube...
             this._cube.render();
             // Set the light position, color and the ambient color...
-            gl.uniform3f(shaderProgram.lightingLocationUniform, mvMatrix[12], mvMatrix[13], mvMatrix[14]);
-            gl.uniform3f(shaderProgram.lightingColorUniform, 0.5, 0.5, 0.5);
-            gl.uniform3f(shaderProgram.ambientColorUniform,  0.5, 0.5, 0.5);
+            gl.uniform3f(renderer.getLightingLocationUniform(), mvMatrix[12], mvMatrix[13], mvMatrix[14]);
+            gl.uniform3f(renderer.getLightingColorUniform(), 0.5, 0.5, 0.5);
+            gl.uniform3f(renderer.getAmbientColorUniform(),  0.5, 0.5, 0.5);
         renderer.mvPopMatrix();
     }
 

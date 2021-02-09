@@ -128,8 +128,9 @@ class GlObject {
      * Render the object...
     **/
     render() {
-        let gl = this._renderer.getGl();
-        let shaderProgram = this._renderer.getShaderProgram();
+        let renderer = this._renderer;
+        let gl = renderer.getGl();
+        let shaderProgram = renderer.getShaderProgram();
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
         gl.enable(gl.DEPTH_TEST);
@@ -150,9 +151,9 @@ class GlObject {
         // Set the texture...
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this._texture);
-        gl.uniform1i(shaderProgram.samplerUniform, 0);
+        gl.uniform1i(renderer.getSamplerUniform(), 0);
         // Don't use the color attribute...
-        gl.uniform1i(shaderProgram.useColorUniform, 0);
+        gl.uniform1i(renderer.getUseColorUniform(), 0);
         // Set the index, render the triangles...
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._glVertexIndexBuffer);
         this._renderer.setMatrixUniforms();

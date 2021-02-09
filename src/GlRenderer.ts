@@ -95,16 +95,6 @@ interface IGlTexture {
 }
 
 interface IGlShaderProgram {
-    useLightingUniform:      number;
-    useColorUniform:         number;
-    alphaUniform:            number;
-    samplerUniform:          number;
-    lightingLocationUniform: number;
-    lightingColorUniform:    number;
-    ambientColorUniform:     number;
-    pMatrixUniform:          number;
-    mvMatrixUniform:         number;
-    nMatrixUniform:          number;
     textureCoordAttribute:   number;
     vertexPositionAttribute: number;
     vertexNormalAttribute:   number;
@@ -210,14 +200,26 @@ interface IGlMatrixList {
 }
 
 interface IGlRenderer {
-    _viewportWidth:  number;
-    _viewportHeight: number;
-    _mvMatrix:       INumberList;
-    _mvMatrixStack:  IGlMatrixList;
-    _pMatrix:        INumberList;
-    _pMatrixStack:   IGlMatrixList;
-    _gl:             IGl;
-    _shaderProgram:  IGlShaderProgram;
+    _screenWidth:             number;
+    _screenHeight:            number;
+    _viewportWidth:           number;
+    _viewportHeight:          number;
+    _useLightingUniform:      number;
+    _useColorUniform:         number;
+    _alphaUniform:            number;
+    _samplerUniform:          number;
+    _lightingLocationUniform: number;
+    _lightingColorUniform:    number;
+    _ambientColorUniform:     number;
+    _pMatrixUniform:          number;
+    _mvMatrixUniform:         number;
+    _nMatrixUniform:          number;
+    _mvMatrix:                INumberList;
+    _mvMatrixStack:           IGlMatrixList;
+    _pMatrix:                 INumberList;
+    _pMatrixStack:            IGlMatrixList;
+    _gl:                      IGl;
+    _shaderProgram:           IGlShaderProgram;
     getGl(): IGl;
     getMvMatrix(): INumberList;
     setMvMatrix(mvMatrix: INumberList): void;
@@ -231,6 +233,13 @@ interface IGlRenderer {
     setScreenHeight(screenHeight: number): void;
     getShader(type: string, source: string): IGlShaderProgram;
     setMatrixUniforms(): void;
+    getAlphaUniform(): number;
+    getUseColorUniform(): number;
+    getUseLightingUniform(): number;
+    getLightingLocationUniform(): number;
+    getLightingColorUniform(): number;
+    getAmbientColorUniform(): number;
+    getSamplerUniform(): number;
     identity(): any;
     initShaders(): void;
     mvPushMatrix(): void;
@@ -241,16 +250,26 @@ interface IGlRenderer {
 }
 
 class GlRenderer implements IGlRenderer {
-    _screenWidth:    number;
-    _screenHeight:   number;
-    _viewportWidth:  number;
-    _viewportHeight: number;
-    _mvMatrix:       INumberList;
-    _mvMatrixStack:  IGlMatrixList;
-    _pMatrix:        INumberList;
-    _pMatrixStack:   IGlMatrixList;
-    _gl:             IGl;
-    _shaderProgram:  IGlShaderProgram;
+    _screenWidth:             number;
+    _screenHeight:            number;
+    _viewportWidth:           number;
+    _viewportHeight:          number;
+    _useLightingUniform:      number;
+    _useColorUniform:         number;
+    _alphaUniform:            number;
+    _samplerUniform:          number;
+    _lightingLocationUniform: number;
+    _lightingColorUniform:    number;
+    _ambientColorUniform:     number;
+    _pMatrixUniform:          number;
+    _mvMatrixUniform:         number;
+    _nMatrixUniform:          number;
+    _mvMatrix:                INumberList;
+    _mvMatrixStack:           IGlMatrixList;
+    _pMatrix:                 INumberList;
+    _pMatrixStack:            IGlMatrixList;
+    _gl:                      IGl;
+    _shaderProgram:           IGlShaderProgram;
 
     constructor(canvas: any) {
         let gl;
@@ -345,16 +364,16 @@ class GlRenderer implements IGlRenderer {
         gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
         shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, 'aVertexColor');
         gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
-        shaderProgram.pMatrixUniform          = gl.getUniformLocation(shaderProgram, 'uPMatrix');
-        shaderProgram.mvMatrixUniform         = gl.getUniformLocation(shaderProgram, 'uMVMatrix');
-        shaderProgram.nMatrixUniform          = gl.getUniformLocation(shaderProgram, 'uNMatrix');
-        shaderProgram.samplerUniform          = gl.getUniformLocation(shaderProgram, 'uSampler');
-        shaderProgram.useLightingUniform      = gl.getUniformLocation(shaderProgram, 'uUseLighting');
-        shaderProgram.useColorUniform         = gl.getUniformLocation(shaderProgram, 'uUseColor');
-        shaderProgram.alphaUniform            = gl.getUniformLocation(shaderProgram, 'uAlpha');
-        shaderProgram.ambientColorUniform     = gl.getUniformLocation(shaderProgram, 'uAmbientColor');
-        shaderProgram.lightingLocationUniform = gl.getUniformLocation(shaderProgram, 'uLightingLocation');
-        shaderProgram.lightingColorUniform    = gl.getUniformLocation(shaderProgram, 'uLightingColor');
+        this._pMatrixUniform          = gl.getUniformLocation(shaderProgram, 'uPMatrix');
+        this._mvMatrixUniform         = gl.getUniformLocation(shaderProgram, 'uMVMatrix');
+        this._nMatrixUniform          = gl.getUniformLocation(shaderProgram, 'uNMatrix');
+        this._samplerUniform          = gl.getUniformLocation(shaderProgram, 'uSampler');
+        this._useLightingUniform      = gl.getUniformLocation(shaderProgram, 'uUseLighting');
+        this._useColorUniform         = gl.getUniformLocation(shaderProgram, 'uUseColor');
+        this._alphaUniform            = gl.getUniformLocation(shaderProgram, 'uAlpha');
+        this._ambientColorUniform     = gl.getUniformLocation(shaderProgram, 'uAmbientColor');
+        this._lightingLocationUniform = gl.getUniformLocation(shaderProgram, 'uLightingLocation');
+        this._lightingColorUniform    = gl.getUniformLocation(shaderProgram, 'uLightingColor');
     }
 
     getShader(type: string, source: string): IGlShaderProgram {
@@ -379,13 +398,41 @@ class GlRenderer implements IGlRenderer {
     setMatrixUniforms(): void {
         let gl            = this._gl;
         let shaderProgram = this._shaderProgram;
-        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, this._pMatrix);
-        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, this._mvMatrix);
+        gl.uniformMatrix4fv(this._pMatrixUniform, false, this._pMatrix);
+        gl.uniformMatrix4fv(this._mvMatrixUniform, false, this._mvMatrix);
         var normalMatrix = mat3.create();
         mat3.fromMat4(normalMatrix, this._mvMatrix);
         mat3.invert(normalMatrix, normalMatrix);
         mat3.transpose(normalMatrix, normalMatrix);
-        gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
+        gl.uniformMatrix3fv(this._nMatrixUniform, false, normalMatrix);
+    }
+
+    getAlphaUniform(): number {
+        return this._alphaUniform;
+    }
+
+    getUseColorUniform(): number {
+        return this._useColorUniform;
+    }
+
+    getUseLightingUniform(): number {
+        return this._useLightingUniform;
+    }
+
+    getLightingLocationUniform(): number {
+        return this._lightingLocationUniform;
+    }
+
+    getLightingColorUniform(): number {
+        return this._lightingColorUniform;
+    }
+
+    getAmbientColorUniform(): number {
+        return this._ambientColorUniform;
+    }
+
+    getSamplerUniform(): number {
+        return this._samplerUniform;
     }
 
     mvPushMatrix(): void {
