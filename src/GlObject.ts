@@ -110,10 +110,10 @@ class GlObject implements IGlObject {
     /**
      * Add a line.
      * Check if the line is also used by an other polygon.
-     & Returns the index of the line.
+     * Returns the index of the line.
     **/
     addLine(v1: number, v2: number): number {
-        this._lines.push({v1:v1, v2:v2});
+        this._lines.push({v1: v1, v2: v2, a: v1 + '_' + v2, b: v2 + '_' + v1});
         return this._lines.length - 1;
     }
 
@@ -127,39 +127,32 @@ class GlObject implements IGlObject {
                 x2: number, y2: number, z2: number, uu2: number, vv2: number,
                 x3: number, y3: number, z3: number, uu3: number, vv3: number): IGlObject {
         let triangleCount: number = this._triangles.length; // The index of the new triangle...
-
         // Add the vertices...
         let vertex1: number = this.addVertex(x1, y1, z1);
         let vertex2: number = this.addVertex(x2, y2, z2);
         let vertex3: number = this.addVertex(x3, y3, z3);
-
         // Add the lines, these are used to calculate the edge of the object...
         // Each line is associated with the new triangle...
         let line1: number = this.addLine(vertex1, vertex2);
         let line2: number = this.addLine(vertex2, vertex3);
         let line3: number = this.addLine(vertex3, vertex1);
-
         // Calculate the normal of the triangle...
         let vector1: unknown = vec3.fromValues(x2 - x1, y2 - y1, z2 - z1);
         let vector2: unknown = vec3.fromValues(x3 - x2, y3 - y2, z3 - z2);
         let vector3: unknown = vec3.create();
-
         vec3.cross(vector3, vector1, vector2)
         vec3.normalize(vector3, vector3);
-
         // Add normals for 3 vertices...
         this
             .addNormal(vector3)
             .addNormal(vector3)
             .addNormal(vector3);
-
         // Add the vertex cooordinates and texture info and store the index values...
         this._glIndices.push(
             this.addGLVertex(x1, y1, z1, uu1, vv1),
             this.addGLVertex(x2, y2, z2, uu2, vv2),
             this.addGLVertex(x3, y3, z3, uu3, vv3)
         );
-
         // Add a new triangle...
         // The center is needed to caculate the direction
         // of the triangle to the light source.
@@ -170,7 +163,6 @@ class GlObject implements IGlObject {
             center:   [(x1 + x2 + x3) / 3, (y1 + y2 + y3) / 3, (z1 + z2 + z3) / 3],
             visible:  false
         });
-
         return this;
     };
 
@@ -183,19 +175,16 @@ class GlObject implements IGlObject {
         gl.bindBuffer(gl.ARRAY_BUFFER, this._glPositionBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._glVertices), gl.STATIC_DRAW);
         this._glPositionBuffer.itemSize = 3;
-
-        this._glVertexIndexBuffer = gl.createBuffer();
+        this._glVertexIndexBuffer       = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._glVertexIndexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this._glIndices), gl.STATIC_DRAW);
         this._glVertexIndexBuffer.itemSize = 1;
         this._glVertexIndexBuffer.numItems = this._glIndices.length;
-
         this._glTextureCoordBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this._glTextureCoordBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._glTextureCoords), gl.STATIC_DRAW);
         this._glTextureCoordBuffer.itemSize = 2;
-
-        this._glNormalBuffer = gl.createBuffer();
+        this._glNormalBuffer                = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this._glNormalBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._glNormals), gl.STATIC_DRAW);
         this._glNormalBuffer.itemSize = 3;
@@ -208,38 +197,29 @@ class GlObject implements IGlObject {
         let renderer:      IGlRenderer      = this._renderer;
         let gl:            IGl              = renderer.getGl();
         let shaderProgram: IGlShaderProgram = renderer.getShaderProgram();
-
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
-
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
-
         // Disable the color attribute, not needed because the object has a texture...
         gl.disableVertexAttribArray(shaderProgram.vertexColorAttribute);
-
         // Set the vertex position buffer...
         gl.bindBuffer(gl.ARRAY_BUFFER, this._glPositionBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this._glPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
         // Enable the normal attribute and set the buffer...
         gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, this._glNormalBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, this._glNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
         // Enable the texture coord attribute and set the buffer...
         gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, this._glTextureCoordBuffer);
         gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this._glTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
         // Set the texture...
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this._texture);
         gl.uniform1i(renderer.getSamplerUniform(), 0);
-
         // Don't use the color attribute...
         gl.uniform1i(renderer.getUseColorUniform(), 0);
-
         // Set the index, render the triangles...
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._glVertexIndexBuffer);
         this._renderer.setMatrixUniforms();

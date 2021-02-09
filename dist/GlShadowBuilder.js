@@ -67,9 +67,10 @@ class GlShadowBuilder {
         let a, b;
         let lines = this._object.getLines();
         let line;
+        let lineSides = this._lineSides;
         let lineSidesHash = {};
         let i, j, k;
-        this._lineSides.length = 0;
+        lineSides.length = 0;
         i = triangles.length;
         while (i) {
             i--;
@@ -81,27 +82,27 @@ class GlShadowBuilder {
                     // Check if the side...
                     k = triangle.lines[j];
                     line = lines[k];
-                    a = line.v1 + '_' + line.v2;
-                    b = line.v2 + '_' + line.v1;
-                    if (lineSidesHash[a] !== undefined) { // Check the v1 -> v2 direction...
+                    if (lineSidesHash[line.a] !== undefined) { // Check the v1 -> v2 direction...
                         // The side already exists, remove it...
-                        delete (lineSidesHash[a]);
+                        lineSidesHash[line.a] = undefined;
                     }
-                    else if (lineSidesHash[b] !== undefined) { // Check the v2 -> v1 direction...
+                    else if (lineSidesHash[line.b] !== undefined) { // Check the v2 -> v1 direction...
                         // The side already exists, remove it...
-                        delete (lineSidesHash[b]);
+                        lineSidesHash[line.b] = undefined;
                     }
                     else {
                         // It's a new side, add it to the list...
-                        lineSidesHash[a] = k;
+                        lineSidesHash[line.a] = k;
                     }
                 }
             }
         }
         // Convert the hash map to an array...
         for (i in lineSidesHash) {
-            line = lines[lineSidesHash[i]];
-            this._lineSides.push(line);
+            if (lineSidesHash[i] !== undefined) {
+                line = lines[lineSidesHash[i]];
+                lineSides.push(line);
+            }
         }
     }
     rotateVectorX(vector, angle) {

@@ -51,10 +51,10 @@ class GlObject {
     /**
      * Add a line.
      * Check if the line is also used by an other polygon.
-     & Returns the index of the line.
+     * Returns the index of the line.
     **/
     addLine(v1, v2) {
-        this._lines.push({ v1: v1, v2: v2 });
+        this._lines.push({ v1: v1, v2: v2, a: v1 + '_' + v2, b: v2 + '_' + v1 });
         return this._lines.length - 1;
     }
     /**
