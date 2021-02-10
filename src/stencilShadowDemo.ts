@@ -28,6 +28,7 @@ interface IDemo {
     _shapeInstances:    IAnyList;
     _cubeAngle:         number;
     _cubeAlpha:         number;
+    _fontScale:         number;
     _shadowAngle:       number;
     _shadowOverlay:     IShadowOverlay;
     _light:             ILight;
@@ -43,6 +44,7 @@ class Demo implements IDemo {
     _shapeInstances:    IAnyList;
     _cubeAngle:         number;
     _cubeAlpha:         number;
+    _fontScale:         number;
     _shadowAngle:       number;
     _shadowOverlay:     IShadowOverlay;
     _light:             ILight;
@@ -64,6 +66,7 @@ class Demo implements IDemo {
         this._shapeInstances    = [];
         this._cubeAngle         = 0;
         this._cubeAlpha         = 0;
+        this._fontScale         = 0;
         this._shadowAngle       = 0;
         this._shadowOverlay     = null;
         this._lastTime          = 0;
@@ -178,6 +181,8 @@ class Demo implements IDemo {
         this._fontCharacters
             .setHAlign(FONT_HALIGN_CENTER)
             .setVAlign(FONT_VALIGN_CENTER)
+            .setScaleX(0.5 + Math.abs(Math.sin(this._fontScale) * 0.1))
+            .setScaleY(0.5 + Math.abs(Math.cos(this._fontScale) * 0.1))
             .render(50, 12.5, 'SHADOW DEMO');
     };
 
@@ -189,6 +194,7 @@ class Demo implements IDemo {
         this._cubeAngle   += 0.03   * elapsed;
         this._cubeAlpha   += 0.0001 * elapsed;
         this._shadowAngle += 0.001  * elapsed;
+        this._fontScale   += 0.003  * elapsed;
         shapeInstances[0].alpha    = Math.abs(Math.sin(this._cubeAlpha));
         shapeInstances[2].angle[1] += 0.0006 * elapsed;
         shapeInstances[2].angle[2] += 0.0005 * elapsed;

@@ -10,6 +10,8 @@ class FontCharacters {
         this._texture = opts.texture;
         this._halign = FONT_HALIGN_LEFT;
         this._halign = FONT_VALIGN_TOP;
+        this._scaleX = 1;
+        this._scaleY = 1;
         this._characters = [];
         for (let ch = 33; ch < 127; ch++) {
             this._characters.push(new FontCharacter({ renderer: this._renderer, ch: ch }));
@@ -21,6 +23,14 @@ class FontCharacters {
     }
     setVAlign(valign) {
         this._valign = valign;
+        return this;
+    }
+    setScaleX(scaleX) {
+        this._scaleX = scaleX;
+        return this;
+    }
+    setScaleY(scaleY) {
+        this._scaleY = scaleY;
         return this;
     }
     getWidth(s) {
@@ -39,10 +49,10 @@ class FontCharacters {
             }
             width += characterWidth;
         }
-        return width;
+        return width * this._scaleX;
     }
     getHeight() {
-        return charInfo['a'.charCodeAt(0)].height;
+        return charInfo['a'.charCodeAt(0)].height * this._scaleY;
     }
     render(xPerc, yPerc, s) {
         if (!this._texture.getReady()) {
@@ -85,7 +95,10 @@ class FontCharacters {
             .mvPushMatrix();
         mat4.ortho(renderer.getPMatrix(), 0, width, height, 0, 0, -100);
         let mvMatrix = renderer.identity();
+        let scaleX = this._scaleX;
+        let scaleY = this._scaleY;
         mat4.translate(mvMatrix, mvMatrix, [x, y, 0]);
+        mat4.scale(mvMatrix, mvMatrix, [scaleX, scaleY, 0]);
         for (let i = 0; i < s.length; i++) {
             let ch = s.charCodeAt(i);
             let characterWidth = 0;
