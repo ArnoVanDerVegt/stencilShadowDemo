@@ -64,14 +64,14 @@ class Demo implements IDemo {
         this._light             = new GlLight({renderer: this._renderer});
         this._lastTime          = 0;
         // Create a floor...
-        this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Texture({renderer: renderer, color1: '#808080', color2: '#707070'}), sizeX: 15, sizeY: 1, sizeZ: 15}), false);
+        this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Grey({renderer: renderer}), sizeX: 15, sizeY: 1, sizeZ: 15}), false);
         // Create the rotating objects with colors...
-        this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Texture({renderer: renderer, color1: '#00EE00', color2: '#FF0000'}), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
-        this.addShape(new Star   ({renderer: renderer, mode: MODE_TEXTURE_PHONG, texture: new Texture({renderer: renderer, color1: '#FFDD00', color2: '#EE6600'}), sizeX: 2,   sizeY: 2,   sizeZ: 0.5}), false);
-        this.addShape(new Pyramid({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Texture({renderer: renderer, color1: '#00FFDD', color2: '#EE00FF'}), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
+        this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new RedGreen({renderer: renderer}), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
+        this.addShape(new Star   ({renderer: renderer, mode: MODE_TEXTURE_PHONG, texture: new OrangeYellow({renderer: renderer}), sizeX: 2,   sizeY: 2,   sizeZ: 0.5}), false);
+        this.addShape(new Pyramid({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new PinkBlue({renderer: renderer}), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
         // Create the objects on the floor in black and white...
-        this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Texture({renderer: renderer, color1: '#FFFFFF', color2: '#000000'}), sizeX: 2, sizeY: 1, sizeZ: 2}), true);
-        this.addShape(new Pyramid({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Texture({renderer: renderer, color1: '#FFFFFF', color2: '#000000'}), sizeX: 2, sizeY: 2, sizeZ: 2}), true);
+        this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new BlackWhite({renderer: renderer}), sizeX: 2, sizeY: 1, sizeZ: 2}), true);
+        this.addShape(new Pyramid({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new BlackWhite({renderer: renderer}), sizeX: 2, sizeY: 2, sizeZ: 2}), true);
         // Create an instance of the floor...
         this._shapeInstances.push({shape:0, location:[ 0, -8,  0], angle:[0, 0, 0]});
         // Create instances of the rotating objects...
