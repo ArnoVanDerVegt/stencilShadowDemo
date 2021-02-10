@@ -1,4 +1,4 @@
-class GlStar extends GlShape {
+class GlStar extends Shape {
     constructor(opts) {
         super(opts);
         this.createObject(opts.sizeX, opts.sizeY, opts.sizeZ);

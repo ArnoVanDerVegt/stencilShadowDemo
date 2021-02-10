@@ -1,7 +1,7 @@
 declare var mat4: any;
 
 interface IGlLight {
-    _cube:     IGlShape;
+    _cube:     IShape;
     _location: INumberList;
     _renderer: IGlRenderer;
     update(angle: number): void;
@@ -13,7 +13,7 @@ interface ILightOpts {
 }
 
 class GlLight implements IGlLight {
-     _cube:     IGlShape;
+     _cube:     IShape;
      _location: INumberList;
      _renderer: IGlRenderer;
 

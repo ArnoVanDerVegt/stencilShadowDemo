@@ -1,7 +1,7 @@
-class GlPyramid extends GlShape {
+class GlPyramid extends Shape {
     _shadow: IGlShadowBuilder;
 
-    constructor(opts: IGlShapeOpts) {
+    constructor(opts: IShapeOpts) {
         super(opts);
         this.createObject(opts.sizeX, opts.sizeY, opts.sizeZ);
     }

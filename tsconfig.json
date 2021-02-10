@@ -1,11 +1,14 @@
 {
   "files": [
+    "src/glMatrix.js",
+    "src/webgl-utils.js",
     "src/general.ts",
     "src/GlRenderer.ts",
     "src/GlShadowOverlay.ts",
     "src/GlShadowBuilder.ts",
     "src/GlObject.ts",
-    "src/GlShape.ts",
+    "src/Shape.ts",
+    "src/Texture.ts",
     "src/objects/GlCube.ts",
     "src/objects/GlPyramid.ts",
     "src/objects/GlStar.ts",
@@ -16,6 +19,7 @@
     "target": "ES6",
     "module": "CommonJS",
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "allowJs": true
   }
 }
