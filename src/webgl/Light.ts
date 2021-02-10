@@ -27,9 +27,9 @@ class Light implements ILight {
      * Update the light source position, render a cube to show the position...
     **/
     update(angle: number): void {
-        let renderer:      IRenderer      = this._renderer;
-        let gl:            IGl              = renderer.getGl();
-        let shaderProgram: IGlShaderProgram = renderer.getShaderProgram();
+        let renderer      = this._renderer;
+        let gl            = renderer.getGl();
+        let shaderProgram = renderer.getShaderProgram();
         this._location = vec3.fromValues(Math.sin(angle) * 6, 18 + Math.cos(angle * 0.5) * 4, Math.cos(angle * 0.8) * 9);
         renderer.mvPushMatrix();
             // Move to the light position...

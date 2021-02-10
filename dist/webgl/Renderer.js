@@ -67,6 +67,7 @@ const VERTEX_SHADER = `
         const float MODE_TEXTURE_FLAT  = 3.0;
         const float MODE_TEXTURE_PHONG = 4.0;
         const float MODE_TEXTURE_ALPHA = 5.0;
+        const float Z_ROUND_FIX        = 0.0001;
 
         attribute vec3 aVertexPosition;
         attribute vec3 aVertexNormal;
@@ -97,6 +98,7 @@ const VERTEX_SHADER = `
             } else if (uMode == MODE_TEXTURE_FLAT) {
                 vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
                 gl_Position   = uPMatrix * mvPosition;
+                gl_Position.z += Z_ROUND_FIX;
                 vTextureCoord = aTextureCoord;
                 vec3  lightDirection            = normalize(uLightingLocation - mvPosition.xyz);
                 vec3  transformedNormal         = uNMatrix * aVertexNormal;
@@ -105,6 +107,7 @@ const VERTEX_SHADER = `
             } else if (uMode == MODE_TEXTURE_PHONG) {
                 vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
                 gl_Position   = uPMatrix * mvPosition;
+                gl_Position.z += Z_ROUND_FIX;
                 vTextureCoord = aTextureCoord;
                 vNormal       = uNMatrix * aVertexNormal;
                 vEyeVec       = -vec3(mvPosition.xyz);
