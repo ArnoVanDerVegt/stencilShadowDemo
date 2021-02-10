@@ -1,7 +1,7 @@
 interface IGlShadowBuilder {
     _renderer:            IGlRenderer;
     _lineSides:           IAnyList;
-    _object:              IGlObject;
+    _object:              IObjct;
     _glPositionBuffer:    IGlBuffer;
     _glVertexIndexBuffer: IGlBuffer;
     _glVertices:          INumberList;
@@ -22,13 +22,13 @@ interface IGlShadowBuilder {
 
 interface GlShadowBuilderOpts {
     renderer: IGlRenderer;
-    object:   IGlObject;
+    object:   IObjct;
 }
 
 class GlShadowBuilder implements IGlShadowBuilder {
     _renderer:            IGlRenderer;
     _lineSides:           IAnyList;
-    _object:              IGlObject;
+    _object:              IObjct;
     _glPositionBuffer:    IGlBuffer;
     _glVertexIndexBuffer: IGlBuffer;
     _glVertices:          INumberList;

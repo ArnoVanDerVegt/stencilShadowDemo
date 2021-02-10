@@ -1,4 +1,4 @@
-class Shape extends GlObject {
+class Shape extends Objct {
     getShadow() {
         return this._shadow;
     }

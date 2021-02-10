@@ -1,4 +1,4 @@
-class GlPyramid extends Shape {
+class Pyramid extends Shape {
     constructor(opts) {
         super(opts);
         this.createObject(opts.sizeX, opts.sizeY, opts.sizeZ);

@@ -1,4 +1,4 @@
-interface IShape extends IGlObject {
+interface IShape extends IObjct {
     _shadow: IGlShadowBuilder;
     getShadow(): IGlShadowBuilder;
     setShadow(shadow: IGlShadowBuilder): void;
@@ -6,13 +6,13 @@ interface IShape extends IGlObject {
     render(): void;
 }
 
-interface IShapeOpts extends IGlObjectOpts {
+interface IShapeOpts extends IObjctOpts {
     sizeX: number;
     sizeY: number;
     sizeZ: number;
 }
 
-class Shape extends GlObject implements IShape {
+class Shape extends Objct implements IShape {
     _shadow: IGlShadowBuilder;
 
     getShadow(): IGlShadowBuilder {

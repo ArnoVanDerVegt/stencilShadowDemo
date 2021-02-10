@@ -2,7 +2,7 @@ const MODE_COLOR = 1.0;
 const MODE_TEXTURE = 2.0;
 const MODE_TEXTURE_FLAT = 3.0;
 const MODE_TEXTURE_PHONG = 4.0;
-class GlObject {
+class Objct {
     constructor(opts) {
         this._mode = opts.mode;
         this._renderer = opts.renderer;
@@ -193,7 +193,7 @@ class GlObject {
         gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this._glTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
         // Set the texture...
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, this._texture);
+        gl.bindTexture(gl.TEXTURE_2D, this._texture.getTexture());
         gl.uniform1i(renderer.getSamplerUniform(), 0);
         // Don't use the color attribute...
         gl.uniform1f(renderer.getModeUniform(), this._mode);

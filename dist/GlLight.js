@@ -2,7 +2,7 @@ class GlLight {
     constructor(opts) {
         this._renderer = opts.renderer;
         // Create a small cube to show the light position...
-        this._cube = new GlCube({ renderer: opts.renderer, mode: MODE_TEXTURE_FLAT, texture: createTexture(this._renderer, '#FFFFFF', '#FFDD00'), sizeX: 0.2, sizeY: 0.2, sizeZ: 0.2 });
+        this._cube = new Cube({ renderer: opts.renderer, mode: MODE_TEXTURE_FLAT, texture: new Texture({ renderer: this._renderer, color1: '#FFFFFF', color2: '#FFDD00' }), sizeX: 0.2, sizeY: 0.2, sizeZ: 0.2 });
     }
     /**
      * Update the light source position, render a cube to show the position...

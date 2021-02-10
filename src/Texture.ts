@@ -20,6 +20,7 @@ interface ITexture {
     _canvas:   any;
     _color1:   string;
     _color2:   string;
+    getTexture(): IGlTexture;
 }
 
 interface ITextureOpts {
@@ -39,9 +40,12 @@ class Texture implements ITexture {
         this._renderer = opts.renderer;
         this._color1   = opts.color1;
         this._color2   = opts.color2;
+        this
+            .createTexture()
+            .createGlTexture();
     }
 
-    createTexture() {
+    createTexture(): Texture {
         let canvas  = document.createElement('canvas');
         let context = canvas.getContext('2d');
         canvas.width      = 128;
@@ -52,9 +56,10 @@ class Texture implements ITexture {
         context.fillRect( 0,  0, 64, 64);
         context.fillRect(64, 64, 64, 64);
         this._canvas = canvas;
+        return this;
     }
 
-    createGlTexture() {
+    createGlTexture(): void {
         let gl = this._renderer.getGl();
         this._texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this._texture);
@@ -67,7 +72,7 @@ class Texture implements ITexture {
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
-    getTexture() {
+    getTexture(): IGlTexture {
         return this._texture;
     }
 }

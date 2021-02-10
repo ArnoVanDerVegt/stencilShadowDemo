@@ -1,4 +1,4 @@
-class GlCube extends Shape {
+class Cube extends Shape {
     constructor(opts: IShapeOpts) {
         super(opts);
         this.createObject(opts.sizeX, opts.sizeY, opts.sizeZ);

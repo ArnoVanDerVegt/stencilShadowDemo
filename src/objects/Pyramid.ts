@@ -1,4 +1,4 @@
-class GlPyramid extends Shape {
+class Pyramid extends Shape {
     _shadow: IGlShadowBuilder;
 
     constructor(opts: IShapeOpts) {

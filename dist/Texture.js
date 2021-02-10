@@ -18,6 +18,9 @@ class Texture {
         this._renderer = opts.renderer;
         this._color1 = opts.color1;
         this._color2 = opts.color2;
+        this
+            .createTexture()
+            .createGlTexture();
     }
     createTexture() {
         let canvas = document.createElement('canvas');
@@ -30,6 +33,7 @@ class Texture {
         context.fillRect(0, 0, 64, 64);
         context.fillRect(64, 64, 64, 64);
         this._canvas = canvas;
+        return this;
     }
     createGlTexture() {
         let gl = this._renderer.getGl();

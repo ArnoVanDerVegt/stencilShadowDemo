@@ -16,30 +16,6 @@
 
 declare var requestAnimFrame: any;
 
-function createTexture(renderer: IGlRenderer, color1, color2) {
-    let gl      = renderer.getGl();
-    let canvas  = document.createElement('canvas');
-    let context = canvas.getContext('2d');
-    let texture;
-    canvas.width      = 128;
-    canvas.height     = 128;
-    context.fillStyle = color1;
-    context.fillRect(0, 0, 128, 128);
-    context.fillStyle = color2;
-    context.fillRect( 0,  0, 64, 64);
-    context.fillRect(64, 64, 64, 64);
-    texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.bindTexture(gl.TEXTURE_2D, null);
-    return texture;
-}
-
 interface IShadowBuilderList {
     [index:number]: IGlShadowBuilder;
     length:         number;
@@ -88,14 +64,14 @@ class Demo implements IDemo {
         this._light             = new GlLight({renderer: this._renderer});
         this._lastTime          = 0;
         // Create a floor...
-        this.addShape(new GlCube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: createTexture(renderer, '#808080', '#707070'), sizeX: 15, sizeY: 1, sizeZ: 15}), false);
+        this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Texture({renderer: renderer, color1: '#808080', color2: '#707070'}), sizeX: 15, sizeY: 1, sizeZ: 15}), false);
         // Create the rotating objects with colors...
-        this.addShape(new GlCube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: createTexture(renderer, '#00EE00', '#FF0000'), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
-        this.addShape(new GlStar   ({renderer: renderer, mode: MODE_TEXTURE_PHONG, texture: createTexture(renderer, '#FFDD00', '#EE6600'), sizeX: 2,   sizeY: 2,   sizeZ: 0.5}), false);
-        this.addShape(new GlPyramid({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: createTexture(renderer, '#00FFDD', '#EE00FF'), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
+        this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Texture({renderer: renderer, color1: '#00EE00', color2: '#FF0000'}), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
+        this.addShape(new Star   ({renderer: renderer, mode: MODE_TEXTURE_PHONG, texture: new Texture({renderer: renderer, color1: '#FFDD00', color2: '#EE6600'}), sizeX: 2,   sizeY: 2,   sizeZ: 0.5}), false);
+        this.addShape(new Pyramid({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Texture({renderer: renderer, color1: '#00FFDD', color2: '#EE00FF'}), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
         // Create the objects on the floor in black and white...
-        this.addShape(new GlCube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: createTexture(renderer, '#FFFFFF', '#000000'), sizeX: 2, sizeY: 1, sizeZ: 2}), true);
-        this.addShape(new GlPyramid({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: createTexture(renderer, '#FFFFFF', '#000000'), sizeX: 2, sizeY: 2, sizeZ: 2}), true);
+        this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Texture({renderer: renderer, color1: '#FFFFFF', color2: '#000000'}), sizeX: 2, sizeY: 1, sizeZ: 2}), true);
+        this.addShape(new Pyramid({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Texture({renderer: renderer, color1: '#FFFFFF', color2: '#000000'}), sizeX: 2, sizeY: 2, sizeZ: 2}), true);
         // Create an instance of the floor...
         this._shapeInstances.push({shape:0, location:[ 0, -8,  0], angle:[0, 0, 0]});
         // Create instances of the rotating objects...
