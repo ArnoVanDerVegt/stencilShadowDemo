@@ -1,21 +1,35 @@
 {
   "files": [
     "src/general.ts",
-    "src/GlRenderer.ts",
-    "src/GlShadowOverlay.ts",
-    "src/GlShadowBuilder.ts",
-    "src/GlObject.ts",
-    "src/GlShape.ts",
-    "src/objects/GlCube.ts",
-    "src/objects/GlPyramid.ts",
-    "src/objects/GlStar.ts",
-    "src/GlLight.ts",
+    "src/webgl/lib/glMatrix.js",
+    "src/webgl/lib/webgl-utils.js",
+    "src/webgl/lib/webgl.ts",
+    "src/webgl/Renderer.ts",
+    "src/webgl/Texture.ts",
+    "src/webgl/Buffer.ts",
+    "src/webgl/Objct.ts",
+    "src/webgl/Shape.ts",
+    "src/webgl/Light.ts",
+    "src/webgl/shadow/ShadowOverlay.ts",
+    "src/webgl/shadow/ShadowBuilder.ts",
+    "src/webgl/font/fontData.js",
+    "src/webgl/font/FontCharacter.ts",
+    "src/webgl/font/FontCharacters.ts",
+    "src/textures/RedGreen.ts",
+    "src/textures/BlackWhite.ts",
+    "src/textures/PinkBlue.ts",
+    "src/textures/OrangeYellow.ts",
+    "src/textures/Grey.ts",
+    "src/objects/Cube.ts",
+    "src/objects/Pyramid.ts",
+    "src/objects/Star.ts",
     "src/stencilShadowDemo.ts"
   ],
   "compilerOptions": {
     "target": "ES6",
     "module": "CommonJS",
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "allowJs": true
   }
 }

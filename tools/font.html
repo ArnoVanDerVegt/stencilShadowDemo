@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Font scanner</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="font.js"></script>
+    <style>
+        canvas {
+            font-family: Bangers;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="info" style="float;left;width:100%;font-family:Bangers;"></div>
+    <canvas id="scan" width="256" height="256" style="display:none;border:1px solid red;font-family:Bangers;"></canvas>
+    <textarea style="width:1024px;height:200px;white-space:nowrap;overflow:auto;" id="code" wrap="soft"></textarea>
+    <canvas id="output" width="1024" height="1024" style="float:left;border:1px solid #000000;display:none;font-family:Bangers;"></canvas>
+    <img id="outputImg"/>
+</body>
+
+</html>
