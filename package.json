@@ -1,0 +1,12 @@
+{
+  "name": "Stencil shadow demo",
+  "version": "0.9.1",
+  "dependencies": {},
+  "devDependencies": {
+    "express": "^4.17.1"
+  },
+  "scripts": {},
+  "engines": {
+    "node": "12.9.x"
+  }
+}

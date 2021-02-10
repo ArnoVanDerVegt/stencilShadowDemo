@@ -1,12 +1,12 @@
 class Pyramid extends Shape {
-    _shadow: IGlShadowBuilder;
+    _shadow: IShadowBuilder;
 
     constructor(opts: IShapeOpts) {
         super(opts);
         this.createObject(opts.sizeX, opts.sizeY, opts.sizeZ);
     }
 
-    setShadow(shadow: IGlShadowBuilder) {
+    setShadow(shadow: IShadowBuilder) {
         this._shadow = shadow;
     }
 

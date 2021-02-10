@@ -16,7 +16,7 @@
 class Demo {
     constructor() {
         let canvas = document.getElementById('demoCanvas');
-        let renderer = new GlRenderer(canvas);
+        let renderer = new Renderer(canvas);
         renderer.initShaders();
         let gl = renderer.getGl();
         gl.clearColor(0.5, 0.7, 0.8, 1.0);
@@ -28,10 +28,13 @@ class Demo {
         this._cubeAngle = 0;
         this._shadowAngle = 0;
         this._shadowOverlay = null;
-        this._light = new GlLight({ renderer: this._renderer });
+        this._light = new Light({ renderer: this._renderer });
         this._lastTime = 0;
+        this._fontTexture = new Texture({ renderer: renderer, src: 'images/font.png' });
+        this._fontCharacter = new FontCharacter({ renderer: renderer });
         // Create a floor...
         this.addShape(new Cube({ renderer: renderer, mode: MODE_TEXTURE_FLAT, texture: new Grey({ renderer: renderer }), sizeX: 15, sizeY: 1, sizeZ: 15 }), false);
+        //this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Texture({renderer: renderer, src: 'images/font.png'}), sizeX: 15, sizeY: 1, sizeZ: 15}), false);
         // Create the rotating objects with colors...
         this.addShape(new Cube({ renderer: renderer, mode: MODE_TEXTURE_FLAT, texture: new RedGreen({ renderer: renderer }), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5 }), true);
         this.addShape(new Star({ renderer: renderer, mode: MODE_TEXTURE_PHONG, texture: new OrangeYellow({ renderer: renderer }), sizeX: 2, sizeY: 2, sizeZ: 0.5 }), false);
@@ -127,9 +130,10 @@ class Demo {
         }
         // Render the overlay to make the shadow areas darker...
         if (!this._shadowOverlay) {
-            this._shadowOverlay = new GlShadowOverlay({ renderer: renderer });
+            this._shadowOverlay = new ShadowOverlay({ renderer: renderer });
         }
         this._shadowOverlay.render();
+        this._fontCharacter.render(this._fontTexture);
     }
     ;
     /**
