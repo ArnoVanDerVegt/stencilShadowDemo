@@ -1,12 +1,18 @@
+const MODE_COLOR = 1.0;
+const MODE_TEXTURE = 2.0;
+const MODE_TEXTURE_FLAT = 3.0;
+const MODE_TEXTURE_PHONG = 4.0;
 class GlObject {
     constructor(opts) {
+        this._mode = opts.mode;
+        this._renderer = opts.renderer;
+        this._texture = opts.texture;
         this._vertices = [];
         this._verticesHash = {};
+        this._vertexNormal = [];
         this._lines = [];
         this._linesUnique = [];
         this._triangles = [];
-        this._renderer = opts.renderer;
-        this._texture = opts.texture;
         this._glVertexCount = -1;
         this._glVertices = [];
         this._glNormals = [];
@@ -48,6 +54,14 @@ class GlObject {
         this._glNormals.push(normal[0], normal[1], normal[2]);
         return this;
     }
+    addVertexNormal(vertexIndex, normal) {
+        let vertexNormal = this._vertexNormal;
+        if (!(vertexIndex in vertexNormal)) {
+            vertexNormal[vertexIndex] = [];
+        }
+        vertexNormal[vertexIndex].push(normal);
+        return this;
+    }
     /**
      * Add a line.
      * Check if the line is also used by an other polygon.
@@ -84,9 +98,15 @@ class GlObject {
         this
             .addNormal(vector3)
             .addNormal(vector3)
-            .addNormal(vector3);
+            .addNormal(vector3)
+            .addVertexNormal(vertex1, vector3)
+            .addVertexNormal(vertex2, vector3)
+            .addVertexNormal(vertex3, vector3);
         // Add the vertex cooordinates and texture info and store the index values...
-        this._glIndices.push(this.addGLVertex(x1, y1, z1, uu1, vv1), this.addGLVertex(x2, y2, z2, uu2, vv2), this.addGLVertex(x3, y3, z3, uu3, vv3));
+        let vertexIndex1 = this.addGLVertex(x1, y1, z1, uu1, vv1);
+        let vertexIndex2 = this.addGLVertex(x2, y2, z2, uu2, vv2);
+        let vertexIndex3 = this.addGLVertex(x3, y3, z3, uu3, vv3);
+        this._glIndices.push(vertexIndex1, vertexIndex2, vertexIndex3);
         // Add a new triangle...
         // The center is needed to caculate the direction
         // of the triangle to the light source.
@@ -120,10 +140,33 @@ class GlObject {
         this._glTextureCoordBuffer.itemSize = 2;
         this._glNormalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this._glNormalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._glNormals), gl.STATIC_DRAW);
+        let normals = (this._mode === MODE_TEXTURE_PHONG) ? this.getVertexNormals() : this._glNormals;
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
         this._glNormalBuffer.itemSize = 3;
     }
     ;
+    getVertexNormals() {
+        let vertexNormals = [];
+        this._vertexNormal.forEach((vertexNormal) => {
+            let x = 0;
+            let y = 0;
+            let z = 0;
+            vertexNormal.forEach((v) => {
+                x += v[0];
+                y += v[1];
+                z += v[2];
+            });
+            vertexNormals.push([x /= vertexNormal.length, y /= vertexNormal.length, z /= vertexNormal.length]);
+        });
+        let normals = [];
+        this._triangles.forEach((triangle) => {
+            triangle.vertices.forEach((index) => {
+                let n = vertexNormals[index];
+                normals.push(n[0], n[1], n[2]);
+            });
+        });
+        return normals;
+    }
     /**
      * Render the object...
     **/
@@ -153,7 +196,7 @@ class GlObject {
         gl.bindTexture(gl.TEXTURE_2D, this._texture);
         gl.uniform1i(renderer.getSamplerUniform(), 0);
         // Don't use the color attribute...
-        gl.uniform1i(renderer.getUseColorUniform(), 0);
+        gl.uniform1f(renderer.getModeUniform(), this._mode);
         // Set the index, render the triangles...
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._glVertexIndexBuffer);
         this._renderer.setMatrixUniforms();

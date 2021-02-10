@@ -88,14 +88,14 @@ class Demo implements IDemo {
         this._light             = new GlLight({renderer: this._renderer});
         this._lastTime          = 0;
         // Create a floor...
-        this.addShape(new GlCube({renderer: renderer, texture: createTexture(renderer, '#808080', '#707070'), sizeX: 15, sizeY: 1, sizeZ: 15}), false);
+        this.addShape(new GlCube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: createTexture(renderer, '#808080', '#707070'), sizeX: 15, sizeY: 1, sizeZ: 15}), false);
         // Create the rotating objects with colors...
-        this.addShape(new GlCube   ({renderer: renderer, texture: createTexture(renderer, '#00EE00', '#FF0000'), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
-        this.addShape(new GlStar   ({renderer: renderer, texture: createTexture(renderer, '#FFDD00', '#EE6600'), sizeX: 2,   sizeY: 2,   sizeZ: 0.5}), true);
-        this.addShape(new GlPyramid({renderer: renderer, texture: createTexture(renderer, '#00FFDD', '#EE00FF'), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
+        this.addShape(new GlCube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: createTexture(renderer, '#00EE00', '#FF0000'), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
+        this.addShape(new GlStar   ({renderer: renderer, mode: MODE_TEXTURE_PHONG, texture: createTexture(renderer, '#FFDD00', '#EE6600'), sizeX: 2,   sizeY: 2,   sizeZ: 0.5}), false);
+        this.addShape(new GlPyramid({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: createTexture(renderer, '#00FFDD', '#EE00FF'), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
         // Create the objects on the floor in black and white...
-        this.addShape(new GlCube   ({renderer: renderer, texture: createTexture(renderer, '#FFFFFF', '#000000'), sizeX: 2, sizeY: 1, sizeZ: 2}), true);
-        this.addShape(new GlPyramid({renderer: renderer, texture: createTexture(renderer, '#FFFFFF', '#000000'), sizeX: 2, sizeY: 2, sizeZ: 2}), true);
+        this.addShape(new GlCube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: createTexture(renderer, '#FFFFFF', '#000000'), sizeX: 2, sizeY: 1, sizeZ: 2}), true);
+        this.addShape(new GlPyramid({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: createTexture(renderer, '#FFFFFF', '#000000'), sizeX: 2, sizeY: 2, sizeZ: 2}), true);
         // Create an instance of the floor...
         this._shapeInstances.push({shape:0, location:[ 0, -8,  0], angle:[0, 0, 0]});
         // Create instances of the rotating objects...
@@ -156,7 +156,6 @@ class Demo implements IDemo {
         mat4.rotateX(mvMatrix, mvMatrix, 0.4);
         mat4.rotateY(mvMatrix, mvMatrix, -this._cubeAngle * 0.01);
         this._light.update(this._shadowAngle);
-        gl.uniform1i(renderer.getUseLightingUniform(), 1);
         // Render all objects...
         i = shapeInstances.length;
         while (i) {

@@ -1,31 +1,39 @@
 declare var vec3: any;
 
+const MODE_COLOR         = 1.0;
+const MODE_TEXTURE       = 2.0;
+const MODE_TEXTURE_FLAT  = 3.0;
+const MODE_TEXTURE_PHONG = 4.0;
+
 interface IGlObject {
-    _vertices:             IGlVertices;     // List of unique vertices of the object
-    _verticesHash:         INumberHashMap;  // Hash list of vertices
-    _lines:                INumberList;     // List of lines in both directions...
-    _linesUnique:          INumberList;     // A list of unique lines
-    _triangles:            INumberList;     // Triangles in the object
+    _vertices:             IGlVertices;       // List of unique vertices of the object
+    _verticesHash:         INumberHashMap;    // Hash list of vertices
+    _vertexNormal:         INumberNumberList;
+    _lines:                INumberList;       // List of lines in both directions...
+    _linesUnique:          INumberList;       // A list of unique lines
+    _triangles:            INumberList;       // Triangles in the object
     _renderer:             IGlRenderer;
     _texture:              unknown;
-    _glVertexCount:        number;          // The active vertex index
-    _glVertices:           INumberList;     // Vertex position list for gl
-    _glNormals:            INumberList;     // Normal list for gl
-    _glIndices:            INumberList;     // Index list for gl
-    _glTextureCoords:      INumberList;     // Texture cooordinate list for gl
-    _glPositionBuffer:     IGlBuffer;       // Position buffer for gl
-    _glNormalBuffer:       IGlBuffer;       // Normal buffer for gl
-    _glTextureCoordBuffer: IGlBuffer;       // Texture cooordinate buffer for gl
-    _glVertexIndexBuffer:  IGlBuffer;       // Vertex buffer for gl
+    _glVertexCount:        number;            // The active vertex index
+    _glVertices:           INumberList;       // Vertex position list for gl
+    _glNormals:            INumberList;       // Normal list for gl
+    _glIndices:            INumberList;       // Index list for gl
+    _glTextureCoords:      INumberList;       // Texture cooordinate list for gl
+    _glPositionBuffer:     IGlBuffer;         // Position buffer for gl
+    _glNormalBuffer:       IGlBuffer;         // Normal buffer for gl
+    _glTextureCoordBuffer: IGlBuffer;         // Texture cooordinate buffer for gl
+    _glVertexIndexBuffer:  IGlBuffer;         // Vertex buffer for gl
 
     addVertex(x: number, y: number, z: number): number;
     addGLVertex(x: number, y: number, z: number, u: number, v: number): number;
     addNormal(normal: unknown): IGlObject;
+    addVertexNormal(vertexIndex: number, normal: INumberList): IGlObject;
     addLine(v1: number, v2: number): number;
     addTriangle(x1: number, y1: number, z1: number, uu1: number, vv1: number,
                 x2: number, y2: number, z2: number, uu2: number, vv2: number,
                 x3: number, y3: number, z3: number, uu3: number, vv3: number): IGlObject;
     createBuffers(): void;
+    getVertexNormals(): INumberList;
     getVertices(): IGlVertices;
     getLines(): INumberList;
     getTriangles(): INumberList;
@@ -34,34 +42,39 @@ interface IGlObject {
 interface IGlObjectOpts {
     renderer: IGlRenderer;
     texture:  unknown;
+    mode:     number;
 }
 
 class GlObject implements IGlObject {
-    _vertices:             IGlVertices;     // List of unique vertices of the object
-    _verticesHash:         INumberHashMap;  // Hash list of vertices
-    _lines:                INumberList;     // List of lines in both directions...
-    _linesUnique:          INumberList;     // A list of unique lines
-    _triangles:            INumberList;     // Triangles in the object
+    _mode:                 number;
+    _vertices:             IGlVertices;       // List of unique vertices of the object
+    _verticesHash:         INumberHashMap;    // Hash list of vertices
+    _vertexNormal:         INumberNumberList;
+    _lines:                INumberList;       // List of lines in both directions...
+    _linesUnique:          INumberList;       // A list of unique lines
+    _triangles:            INumberList;       // Triangles in the object
     _renderer:             IGlRenderer;
     _texture:              unknown;
-    _glVertexCount:        number;          // The active vertex index
-    _glVertices:           INumberList;     // Vertex position list for gl
-    _glNormals:            INumberList;     // Normal list for gl
-    _glIndices:            INumberList;     // Index list for gl
-    _glTextureCoords:      INumberList;     // Texture cooordinate list for gl
-    _glPositionBuffer:     IGlBuffer;       // Position buffer for gl
-    _glNormalBuffer:       IGlBuffer;       // Normal buffer for gl
-    _glTextureCoordBuffer: IGlBuffer;       // Texture cooordinate buffer for gl
-    _glVertexIndexBuffer:  IGlBuffer;       // Vertex buffer for gl
+    _glVertexCount:        number;            // The active vertex index
+    _glVertices:           INumberList;       // Vertex position list for gl
+    _glNormals:            INumberList;       // Normal list for gl
+    _glIndices:            INumberList;       // Index list for gl
+    _glTextureCoords:      INumberList;       // Texture cooordinate list for gl
+    _glPositionBuffer:     IGlBuffer;         // Position buffer for gl
+    _glNormalBuffer:       IGlBuffer;         // Normal buffer for gl
+    _glTextureCoordBuffer: IGlBuffer;         // Texture cooordinate buffer for gl
+    _glVertexIndexBuffer:  IGlBuffer;         // Vertex buffer for gl
 
     constructor(opts: IGlObjectOpts) {
+        this._mode                 =  opts.mode;
+        this._renderer             =  opts.renderer;
+        this._texture              =  opts.texture;
         this._vertices             =  [];
         this._verticesHash         =  {};
+        this._vertexNormal         =  [];
         this._lines                =  [];
         this._linesUnique          =  [];
         this._triangles            =  [];
-        this._renderer             =  opts.renderer;
-        this._texture              =  opts.texture;
         this._glVertexCount        = -1;
         this._glVertices           =  [];
         this._glNormals            =  [];
@@ -102,8 +115,17 @@ class GlObject implements IGlObject {
     /**
      * Add a normal to a gl list...
     **/
-    addNormal(normal: unknown): IGlObject {
+    addNormal(normal: INumberList): IGlObject {
         this._glNormals.push(normal[0], normal[1], normal[2]);
+        return this;
+    }
+
+    addVertexNormal(vertexIndex: number, normal: INumberList): IGlObject {
+        let vertexNormal = this._vertexNormal;
+        if (!(vertexIndex in vertexNormal)) {
+            vertexNormal[vertexIndex] = [];
+        }
+        vertexNormal[vertexIndex].push(normal);
         return this;
     }
 
@@ -137,22 +159,24 @@ class GlObject implements IGlObject {
         let line2: number = this.addLine(vertex2, vertex3);
         let line3: number = this.addLine(vertex3, vertex1);
         // Calculate the normal of the triangle...
-        let vector1: unknown = vec3.fromValues(x2 - x1, y2 - y1, z2 - z1);
-        let vector2: unknown = vec3.fromValues(x3 - x2, y3 - y2, z3 - z2);
-        let vector3: unknown = vec3.create();
+        let vector1: INumberList = vec3.fromValues(x2 - x1, y2 - y1, z2 - z1);
+        let vector2: INumberList = vec3.fromValues(x3 - x2, y3 - y2, z3 - z2);
+        let vector3: INumberList = vec3.create();
         vec3.cross(vector3, vector1, vector2)
         vec3.normalize(vector3, vector3);
         // Add normals for 3 vertices...
         this
             .addNormal(vector3)
             .addNormal(vector3)
-            .addNormal(vector3);
+            .addNormal(vector3)
+            .addVertexNormal(vertex1, vector3)
+            .addVertexNormal(vertex2, vector3)
+            .addVertexNormal(vertex3, vector3);
         // Add the vertex cooordinates and texture info and store the index values...
-        this._glIndices.push(
-            this.addGLVertex(x1, y1, z1, uu1, vv1),
-            this.addGLVertex(x2, y2, z2, uu2, vv2),
-            this.addGLVertex(x3, y3, z3, uu3, vv3)
-        );
+        let vertexIndex1 = this.addGLVertex(x1, y1, z1, uu1, vv1);
+        let vertexIndex2 = this.addGLVertex(x2, y2, z2, uu2, vv2);
+        let vertexIndex3 = this.addGLVertex(x3, y3, z3, uu3, vv3);
+        this._glIndices.push(vertexIndex1, vertexIndex2, vertexIndex3);
         // Add a new triangle...
         // The center is needed to caculate the direction
         // of the triangle to the light source.
@@ -186,9 +210,33 @@ class GlObject implements IGlObject {
         this._glTextureCoordBuffer.itemSize = 2;
         this._glNormalBuffer                = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this._glNormalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._glNormals), gl.STATIC_DRAW);
+        let normals = (this._mode === MODE_TEXTURE_PHONG) ? this.getVertexNormals() : this._glNormals;
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
         this._glNormalBuffer.itemSize = 3;
     };
+
+    getVertexNormals(): INumberList {
+        let vertexNormals = [];
+        this._vertexNormal.forEach((vertexNormal) => {
+            let x = 0;
+            let y = 0;
+            let z = 0;
+            vertexNormal.forEach((v) => {
+                x += v[0];
+                y += v[1];
+                z += v[2];
+            });
+            vertexNormals.push([x /= vertexNormal.length, y /= vertexNormal.length, z /= vertexNormal.length]);
+        });
+        let normals = [];
+        this._triangles.forEach((triangle) => {
+            triangle.vertices.forEach((index) => {
+                let n = vertexNormals[index];
+                normals.push(n[0], n[1], n[2]);
+            });
+        });
+        return normals;
+    }
 
     /**
      * Render the object...
@@ -219,7 +267,7 @@ class GlObject implements IGlObject {
         gl.bindTexture(gl.TEXTURE_2D, this._texture);
         gl.uniform1i(renderer.getSamplerUniform(), 0);
         // Don't use the color attribute...
-        gl.uniform1i(renderer.getUseColorUniform(), 0);
+        gl.uniform1f(renderer.getModeUniform(), this._mode);
         // Set the index, render the triangles...
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._glVertexIndexBuffer);
         this._renderer.setMatrixUniforms();

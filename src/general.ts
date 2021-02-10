@@ -3,6 +3,7 @@ interface INumberList {
     length:         number;
     push(...args: any[]);
     pop(): any;
+    forEach(...args: any[]);
 }
 
 interface INumberNumberList {
@@ -10,6 +11,7 @@ interface INumberNumberList {
     length:         number;
     push(...args: any[]);
     pop(): INumberList;
+    forEach(...args: any[]);
 }
 
 interface IAnyList {

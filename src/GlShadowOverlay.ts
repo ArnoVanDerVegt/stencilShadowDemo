@@ -69,15 +69,10 @@ class GlShadowOverlay implements IGlShadowOverlay {
             gl.blendFunc(gl.ONE, gl.SRC_ALPHA);
             gl.enable(gl.BLEND);
             // Enable color...
-            gl.uniform1i(renderer.getUseColorUniform(), 1);
-            // Disable lighting...
-            gl.uniform1i(renderer.getUseLightingUniform(), 0);
+            gl.uniform1f(renderer.getModeUniform(), MODE_COLOR);
             // Render 2D...
             renderer.pPushMatrix();
                 mat4.ortho(renderer.getPMatrix(), 0, renderer.getViewportWidth(), renderer.getViewportHeight(), 0, 0, -100);
-                //let mvMatrix = renderer.getMvMatrix();
-                //mat4.identity(mvMatrix, mvMatrix);
-                //renderer.setMvMatrix(mvMatrix);
                 let mvMatrix = renderer.identity();
                 // Set the buffers...
                 gl.bindBuffer(gl.ARRAY_BUFFER, this._glPositionBuffer);

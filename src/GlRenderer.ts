@@ -1,83 +1,114 @@
 declare var mat3: any;
 declare var mat4: any;
 
-const FRAGMENT_SHADER: string = [
-        '#ifdef GL_ES',
-        'precision highp float;',
-        '#endif',
-        '',
-        'varying vec2 vTextureCoord;',
-        'varying vec3 vLightWeighting;',
-        'varying vec4 vColor;',
-        '',
-        'uniform sampler2D uSampler;',
-        'uniform bool uUseLighting;',
-        'uniform bool uUseColor;',
-        'uniform float uAlpha;',
-        '',
-        'void main(void) {',
-        '    if (!uUseColor) {',
-        '        vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));',
-        '        if (!uUseLighting) {',
-        '            gl_FragColor = vec4(textureColor.rgb, textureColor.a);',
-        '        }',
-        '        else {',
-        '            gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);',
-        '        }',
-        '    }',
-        '    else {',
-        '        gl_FragColor = vColor * uAlpha;',
-        '    }',
-        '}'
-    ].join('\n');
+const FRAGMENT_SHADER: string = `
+        #ifdef GL_ES
+        precision highp float;
+        #endif
 
-const VERTEX_SHADER: string = [
-        'attribute vec3 aVertexPosition;',
-        'attribute vec3 aVertexNormal;',
-        'attribute vec2 aTextureCoord;',
-        '',
-        'uniform mat4 uMVMatrix;',
-        'uniform mat4 uPMatrix;',
-        'uniform mat3 uNMatrix;',
-        '',
-        'uniform vec3 uAmbientColor;',
-        '',
-        'uniform vec3 uLightingLocation;',
-        'uniform vec3 uLightingColor;',
-        '',
-        'uniform bool uUseLighting;',
-        'uniform bool uUseColor;',
-        '',
-        'varying vec2 vTextureCoord;',
-        'varying vec3 vLightWeighting;',
-        '',
-        'varying vec4 vColor;',
-        '',
-        'attribute vec4 aVertexColor;',
-        '',
-        'void main(void) {',
-        '    if (!uUseColor) {',
-        '        vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);',
-        '        gl_Position = uPMatrix * mvPosition;',
-        '        vTextureCoord = aTextureCoord;',
-        '',
-        '        if (!uUseLighting) {',
-        '            vLightWeighting = vec3(0.4, 0.4, 0.4);',
-        '        }',
-        '        else {',
-        '            vec3 lightDirection = normalize(uLightingLocation - mvPosition.xyz);',
-        '',
-        '            vec3 transformedNormal = uNMatrix * aVertexNormal;',
-        '            float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);',
-        '            vLightWeighting = uAmbientColor + uLightingColor * directionalLightWeighting;',
-        '        }',
-        '    }',
-        '    else {',
-        '        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);',
-        '        vColor = aVertexColor;',
-        '    }',
-        '}'
-    ].join('\n');
+        const float MODE_COLOR         = 1.0;
+        const float MODE_TEXTURE       = 2.0;
+        const float MODE_TEXTURE_FLAT  = 3.0;
+        const float MODE_TEXTURE_PHONG = 4.0;
+
+        const float cShininess        = 500.0;
+        const vec3  cLightDirection   = vec3(0.0, -1.0, -1.0);
+        const vec4  cLightAmbient     = vec4(0.1,  0.1,  0.1,  1.0);
+        const vec4  cLightDiffuse     = vec4(1.0,  1.0,  1.0,  1.0);
+        const vec4  cLightSpecular    = vec4(1.0,  1.0,  1.0,  1.0);
+        const vec4  cMaterialAmbient  = vec4(1.0,  1.0,  1.0,  1.0);
+        const vec4  cMaterialSpecular = vec4(1.0,  1.0,  1.0,  1.0);
+
+        varying vec2 vTextureCoord;
+        varying vec3 vLightWeighting;
+        varying vec4 vColor;
+        varying vec3 vNormal;
+        varying vec3 vEyeVec;
+
+        uniform float     uMode;
+        uniform sampler2D uSampler;
+        uniform float     uAlpha;
+
+        void main(void) {
+            vec4 textureColor;
+            if (uMode == MODE_COLOR) {
+                gl_FragColor = vColor * uAlpha;
+            } else if (uMode == MODE_TEXTURE) {
+                textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+                gl_FragColor = textureColor;
+            } else if (uMode == MODE_TEXTURE_FLAT) {
+                textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+                gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
+            } else if (uMode == MODE_TEXTURE_PHONG) {
+                textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+                vec3  L           = normalize(cLightDirection);
+                vec3  N           = normalize(vNormal);
+                float lambertTerm = dot(N, -L);
+                vec4  Ia          = cLightAmbient * cMaterialAmbient;
+                vec4  Id          = vec4(0.0, 0.0, 0.0, 1.0);
+                vec4  Is          = vec4(0.0, 0.0, 0.0, 1.0);
+                if (lambertTerm > 0.0) {
+                    Id = cLightDiffuse * vec4(textureColor.rgb, 1.0) * lambertTerm; //add diffuse term
+                    vec3 E         = normalize(vEyeVec);
+                    vec3 R         = reflect(L, N);
+                    float specular = pow(max(dot(R, E), 0.0), cShininess);
+                    Is = cLightSpecular * cMaterialSpecular * specular; //add specular term
+                }
+                vec4 color = Ia + Id + Is;
+                color.a = 1.0;
+                gl_FragColor = color;
+            }
+        }
+    `;
+
+const VERTEX_SHADER: string = `
+        const float MODE_COLOR         = 1.0;
+        const float MODE_TEXTURE       = 2.0;
+        const float MODE_TEXTURE_FLAT  = 3.0;
+        const float MODE_TEXTURE_PHONG = 4.0;
+
+        attribute vec3 aVertexPosition;
+        attribute vec3 aVertexNormal;
+        attribute vec2 aTextureCoord;
+        attribute vec4 aVertexColor;
+
+        uniform mat4  uMVMatrix;
+        uniform mat4  uPMatrix;
+        uniform mat3  uNMatrix;
+        uniform vec3  uAmbientColor;
+        uniform vec3  uLightingLocation;
+        uniform vec3  uLightingColor;
+        uniform float uMode;
+
+        varying vec2 vTextureCoord;
+        varying vec3 vLightWeighting;
+        varying vec4 vColor;
+        varying vec3 vNormal;
+        varying vec3 vEyeVec;
+
+        void main(void) {
+            if (uMode == MODE_COLOR) {
+                gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+                vColor = aVertexColor;
+            } else if (uMode == MODE_TEXTURE) {
+                vLightWeighting = vec3(0.4, 0.4, 0.4);
+            } else if (uMode == MODE_TEXTURE_FLAT) {
+                vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
+                gl_Position = uPMatrix * mvPosition;
+                vTextureCoord = aTextureCoord;
+                vec3  lightDirection            = normalize(uLightingLocation - mvPosition.xyz);
+                vec3  transformedNormal         = uNMatrix * aVertexNormal;
+                float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);
+                vLightWeighting = uAmbientColor + uLightingColor * directionalLightWeighting;
+            } else if (uMode == MODE_TEXTURE_PHONG) {
+                vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
+                gl_Position = uPMatrix * mvPosition;
+                vTextureCoord = aTextureCoord;
+                vNormal       = uNMatrix * aVertexNormal;
+                vEyeVec       = -vec3(mvPosition.xyz);
+            }
+        }
+    `;
 
 interface IGlVertices {
     [index:number]: INumberList;
@@ -204,8 +235,7 @@ interface IGlRenderer {
     _screenHeight:            number;
     _viewportWidth:           number;
     _viewportHeight:          number;
-    _useLightingUniform:      number;
-    _useColorUniform:         number;
+    _modeUniform:             number;
     _alphaUniform:            number;
     _samplerUniform:          number;
     _lightingLocationUniform: number;
@@ -234,8 +264,7 @@ interface IGlRenderer {
     getShader(type: string, source: string): IGlShaderProgram;
     setMatrixUniforms(): void;
     getAlphaUniform(): number;
-    getUseColorUniform(): number;
-    getUseLightingUniform(): number;
+    getModeUniform(): number;
     getLightingLocationUniform(): number;
     getLightingColorUniform(): number;
     getAmbientColorUniform(): number;
@@ -254,8 +283,7 @@ class GlRenderer implements IGlRenderer {
     _screenHeight:            number;
     _viewportWidth:           number;
     _viewportHeight:          number;
-    _useLightingUniform:      number;
-    _useColorUniform:         number;
+    _modeUniform:             number;
     _alphaUniform:            number;
     _samplerUniform:          number;
     _lightingLocationUniform: number;
@@ -368,8 +396,7 @@ class GlRenderer implements IGlRenderer {
         this._mvMatrixUniform         = gl.getUniformLocation(shaderProgram, 'uMVMatrix');
         this._nMatrixUniform          = gl.getUniformLocation(shaderProgram, 'uNMatrix');
         this._samplerUniform          = gl.getUniformLocation(shaderProgram, 'uSampler');
-        this._useLightingUniform      = gl.getUniformLocation(shaderProgram, 'uUseLighting');
-        this._useColorUniform         = gl.getUniformLocation(shaderProgram, 'uUseColor');
+        this._modeUniform             = gl.getUniformLocation(shaderProgram, 'uMode');
         this._alphaUniform            = gl.getUniformLocation(shaderProgram, 'uAlpha');
         this._ambientColorUniform     = gl.getUniformLocation(shaderProgram, 'uAmbientColor');
         this._lightingLocationUniform = gl.getUniformLocation(shaderProgram, 'uLightingLocation');
@@ -411,12 +438,8 @@ class GlRenderer implements IGlRenderer {
         return this._alphaUniform;
     }
 
-    getUseColorUniform(): number {
-        return this._useColorUniform;
-    }
-
-    getUseLightingUniform(): number {
-        return this._useLightingUniform;
+    getModeUniform(): number {
+        return this._modeUniform;
     }
 
     getLightingLocationUniform(): number {
