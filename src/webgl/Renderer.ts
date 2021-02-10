@@ -10,6 +10,7 @@ const FRAGMENT_SHADER: string = `
         const float MODE_TEXTURE       = 2.0;
         const float MODE_TEXTURE_FLAT  = 3.0;
         const float MODE_TEXTURE_PHONG = 4.0;
+        const float MODE_TEXTURE_ALPHA = 5.0;
 
         const float cShininess        = 500.0;
         const vec3  cLightDirection   = vec3(0.0, -1.0, -1.0);
@@ -57,6 +58,9 @@ const FRAGMENT_SHADER: string = `
                 vec4 color = Ia + Id + Is;
                 color.a = 1.0;
                 gl_FragColor = color;
+            } else if (uMode == MODE_TEXTURE_ALPHA) {
+                textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+                gl_FragColor = vec4(textureColor.rgb, uAlpha);
             }
         }
     `;
@@ -66,6 +70,7 @@ const VERTEX_SHADER: string = `
         const float MODE_TEXTURE       = 2.0;
         const float MODE_TEXTURE_FLAT  = 3.0;
         const float MODE_TEXTURE_PHONG = 4.0;
+        const float MODE_TEXTURE_ALPHA = 5.0;
 
         attribute vec3 aVertexPosition;
         attribute vec3 aVertexNormal;
@@ -107,6 +112,9 @@ const VERTEX_SHADER: string = `
                 vTextureCoord = aTextureCoord;
                 vNormal       = uNMatrix * aVertexNormal;
                 vEyeVec       = -vec3(mvPosition.xyz);
+            } else if (uMode == MODE_TEXTURE_ALPHA) {
+                gl_Position   = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+                vTextureCoord = aTextureCoord;
             }
         }
     `;

@@ -1,7 +1,7 @@
 interface IShadowBuilder {
     _renderer:            IRenderer;
     _lineSides:           IAnyList;
-    _object:              IObjct;
+    _objct:               IObjct;
     _glPositionBuffer:    IGlBuffer;
     _glVertexIndexBuffer: IGlBuffer;
     _glVertices:          INumberList;
@@ -18,17 +18,18 @@ interface IShadowBuilder {
     update(lightLocation: INumberList, lightAngle: number, matrix: any, zoom: number): void;
     createVolume(lightLocation: INumberList): void;
     render(): void;
+    setAlpha(alpha: number): IShadowBuilder;
 }
 
 interface GlShadowBuilderOpts {
     renderer: IRenderer;
-    object:   IObjct;
+    objct:    IObjct;
 }
 
 class GlShadowBuilder implements IShadowBuilder {
     _renderer:            IRenderer;
     _lineSides:           IAnyList;
-    _object:              IObjct;
+    _objct:               IObjct;
     _glPositionBuffer:    IGlBuffer;
     _glVertexIndexBuffer: IGlBuffer;
     _glVertices:          INumberList;
@@ -37,7 +38,7 @@ class GlShadowBuilder implements IShadowBuilder {
 
     constructor(opts: GlShadowBuilderOpts) {
         this._renderer            = opts.renderer;
-        this._object              = opts.object;
+        this._objct               = opts.objct;
         this._lineSides           = [];
         this._glPositionBuffer    = null;
         this._glVertexIndexBuffer = null;
@@ -78,7 +79,7 @@ class GlShadowBuilder implements IShadowBuilder {
      * Check which triangles face the light source...
     **/
     checkDirection(lightLocation: INumberList): IShadowBuilder {
-        let triangles = this._object.getTriangles();
+        let triangles = this._objct.getTriangles();
         let triangle;
         let vector;
         let i = triangles.length;
@@ -100,10 +101,10 @@ class GlShadowBuilder implements IShadowBuilder {
      * Find the edge of the object...
     **/
     findEdge(): void {
-        let triangles     = this._object.getTriangles();
+        let triangles     = this._objct.getTriangles();
         let triangle;
         let a, b;
-        let lines         = this._object.getLines();
+        let lines         = this._objct.getLines();
         let line;
         let lineSides     = this._lineSides;
         let lineSidesHash = {};
@@ -211,8 +212,8 @@ class GlShadowBuilder implements IShadowBuilder {
     **/
     createVolume(lightLocation: INumberList): void {
         let gl         = this._renderer.getGl();
-        let vertices   = this._object.getVertices();
-        let triangles  = this._object.getTriangles();
+        let vertices   = this._objct.getVertices();
+        let triangles  = this._objct.getTriangles();
         let triangle;
         let lineSides  = this._lineSides;
         let vector3    = vec3.create();
@@ -279,8 +280,8 @@ class GlShadowBuilder implements IShadowBuilder {
     }
 
     render(): void {
-        let gl:            IGl              = this._renderer.getGl();
-        let shaderProgram: IGlShaderProgram = this._renderer.getShaderProgram();
+        let gl            = this._renderer.getGl();
+        let shaderProgram = this._renderer.getShaderProgram();
         // Create the volume for the light...
         this.createVolume(this._lightLocation);
         gl.bindBuffer(gl.ARRAY_BUFFER, this._glPositionBuffer);
@@ -314,5 +315,10 @@ class GlShadowBuilder implements IShadowBuilder {
         gl.colorMask(true, true, true, true);
         gl.depthMask(true);
         gl.disable(gl.STENCIL_TEST);
+    }
+
+    setAlpha(alpha: number): IShadowBuilder {
+        this._objct.setAlpha(alpha);
+        return this;
     }
 }

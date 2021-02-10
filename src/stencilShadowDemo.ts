@@ -27,6 +27,7 @@ interface IDemo {
     _shadowBuilderList: IShadowBuilderList;
     _shapeInstances:    IAnyList;
     _cubeAngle:         number;
+    _cubeAlpha:         number;
     _shadowAngle:       number;
     _shadowOverlay:     IShadowOverlay;
     _light:             ILight;
@@ -41,6 +42,7 @@ class Demo implements IDemo {
     _shadowBuilderList: IShadowBuilderList;
     _shapeInstances:    IAnyList;
     _cubeAngle:         number;
+    _cubeAlpha:         number;
     _shadowAngle:       number;
     _shadowOverlay:     IShadowOverlay;
     _light:             ILight;
@@ -61,39 +63,43 @@ class Demo implements IDemo {
         this._shadowBuilderList = [];
         this._shapeInstances    = [];
         this._cubeAngle         = 0;
+        this._cubeAlpha         = 0;
         this._shadowAngle       = 0;
         this._shadowOverlay     = null;
         this._lastTime          = 0;
         this._light             = new Light({renderer: this._renderer});
         this._fontCharacters    = new FontCharacters({renderer: renderer, texture: new Texture({renderer: renderer, src: 'images/font.png'})});
         // Create a floor...
-        this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_PHONG,  texture: new Grey({renderer: renderer}), sizeX: 15, sizeY: 1, sizeZ: 15}), false);
-        //this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Texture({renderer: renderer, src: 'images/font.png'}), sizeX: 15, sizeY: 1, sizeZ: 15}), false);
+        this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_PHONG, texture: new Grey({renderer: renderer}), sizeX: 15, sizeY: 1, sizeZ: 15}), false);
         // Create the rotating objects with colors...
         this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new RedGreen({renderer: renderer}), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
         this.addShape(new Star   ({renderer: renderer, mode: MODE_TEXTURE_PHONG, texture: new OrangeYellow({renderer: renderer}), sizeX: 2,   sizeY: 2,   sizeZ: 0.5}), false);
         this.addShape(new Pyramid({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new PinkBlue({renderer: renderer}), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), true);
+        // Alpha blend...
+        this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_ALPHA, texture: new RedGreen({renderer: renderer}), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5}), false);
         // Create the objects on the floor in black and white...
         this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new BlackWhite({renderer: renderer}), sizeX: 2, sizeY: 1, sizeZ: 2}), true);
         this.addShape(new Pyramid({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new BlackWhite({renderer: renderer}), sizeX: 2, sizeY: 2, sizeZ: 2}), true);
+        // Blended...
+        this._shapeInstances.push({shape:4, location:[-8,  0,  0], angle:[0, 0, 0], alpha: 1});
         // Create an instance of the floor...
-        this._shapeInstances.push({shape:0, location:[ 0, -8,  0], angle:[0, 0, 0]});
+        this._shapeInstances.push({shape:0, location:[ 0, -8,  0], angle:[0, 0, 0], alpha: 1});
         // Create instances of the rotating objects...
-        this._shapeInstances.push({shape:1, location:[-4,  5,  0], angle:[0, 0, 0]});
-        this._shapeInstances.push({shape:2, location:[ 0,  1,  0], angle:[0, 0, 0]});
-        this._shapeInstances.push({shape:3, location:[ 4, -3,  0], angle:[0, 0, 0]});
+        this._shapeInstances.push({shape:1, location:[-4,  5,  0], angle:[0, 0, 0], alpha: 1});
+        this._shapeInstances.push({shape:2, location:[ 0,  1,  0], angle:[0, 0, 0], alpha: 1});
+        this._shapeInstances.push({shape:3, location:[ 4, -3,  0], angle:[0, 0, 0], alpha: 1});
         // Create instances for the objects on the floor...
-        this._shapeInstances.push({shape:4, location:[-8, -6,  8], angle:[0, 0, 0]});
-        this._shapeInstances.push({shape:4, location:[ 8, -6, -8], angle:[0, 0, 0]});
-        this._shapeInstances.push({shape:5, location:[-8, -6, -8], angle:[0, 0, 0]});
-        this._shapeInstances.push({shape:5, location:[ 8, -6,  8], angle:[0, 0, 0]});
+        this._shapeInstances.push({shape:5, location:[-8, -6,  8], angle:[0, 0, 0], alpha: 1});
+        this._shapeInstances.push({shape:5, location:[ 8, -6, -8], angle:[0, 0, 0], alpha: 1});
+        this._shapeInstances.push({shape:6, location:[-8, -6, -8], angle:[0, 0, 0], alpha: 1});
+        this._shapeInstances.push({shape:6, location:[ 8, -6,  8], angle:[0, 0, 0], alpha: 1});
     };
 
     /**
      * Add a shape to the list, check if a shadow builder is needed...
     **/
     addShape(shape: IShape, shadow: boolean): void {
-        shape.setShadow(shadow ? new GlShadowBuilder({object: shape, renderer: this._renderer}) : null);
+        shape.setShadow(shadow ? new GlShadowBuilder({objct: shape, renderer: this._renderer}) : null);
         this._shadowBuilderList.push(shape);
     };
 
@@ -143,7 +149,9 @@ class Demo implements IDemo {
             shapeInstance = shapeInstances[i];
             renderer.mvPushMatrix();
                 this.applyShapeInstance(shapeInstance);
-                this._shadowBuilderList[shapeInstance.shape].render();
+                this._shadowBuilderList[shapeInstance.shape]
+                    .setAlpha(shapeInstance.alpha)
+                    .render();
             renderer.mvPopMatrix();
         }
         // Render all shadows...
@@ -178,13 +186,15 @@ class Demo implements IDemo {
     **/
     animate(elapsed: number): void {
         let shapeInstances = this._shapeInstances;
-        this._cubeAngle   += 0.03  * elapsed;
-        this._shadowAngle += 0.001 * elapsed;
-        shapeInstances[1].angle[1] += 0.0006 * elapsed;
-        shapeInstances[1].angle[2] += 0.0005 * elapsed;
-        shapeInstances[2].angle[1] -= 0.0004 * elapsed;
-        shapeInstances[3].angle[0] += 0.0003 * elapsed;
-        shapeInstances[3].angle[1] -= 0.0005 * elapsed;
+        this._cubeAngle   += 0.03   * elapsed;
+        this._cubeAlpha   += 0.0001 * elapsed;
+        this._shadowAngle += 0.001  * elapsed;
+        shapeInstances[0].alpha    = Math.abs(Math.sin(this._cubeAlpha));
+        shapeInstances[2].angle[1] += 0.0006 * elapsed;
+        shapeInstances[2].angle[2] += 0.0005 * elapsed;
+        shapeInstances[3].angle[1] -= 0.0004 * elapsed;
+        shapeInstances[4].angle[0] += 0.0003 * elapsed;
+        shapeInstances[4].angle[1] -= 0.0005 * elapsed;
     };
 
     update() {

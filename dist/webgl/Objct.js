@@ -2,6 +2,7 @@ const MODE_COLOR = 1.0;
 const MODE_TEXTURE = 2.0;
 const MODE_TEXTURE_FLAT = 3.0;
 const MODE_TEXTURE_PHONG = 4.0;
+const MODE_TEXTURE_ALPHA = 5.0;
 class Objct {
     constructor(opts) {
         this._mode = opts.mode;
@@ -23,6 +24,7 @@ class Objct {
         this._normalBuffer = null;
         this._textureCoordBuffer = null;
         this._indexBuffer = null;
+        this._alpha = 1;
     }
     /**
      * Add a vertex, merge close vertices...
@@ -174,12 +176,20 @@ class Objct {
         gl.bindTexture(gl.TEXTURE_2D, this._texture.getTexture());
         gl.uniform1i(renderer.getSamplerUniform(), 0);
         gl.uniform1f(renderer.getModeUniform(), this._mode);
+        if (this._mode === MODE_TEXTURE_ALPHA) {
+            gl.enable(gl.BLEND);
+            gl.depthMask(false);
+            gl.uniform1f(renderer.getAlphaUniform(), this._alpha);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        }
         renderer.setMatrixUniforms();
         this._colorBuffer.disable();
         this._positionBuffer.bind().enable();
         this._normalBuffer.bind().enable();
         this._textureCoordBuffer.bind().enable();
         this._indexBuffer.bind().draw();
+        gl.disable(gl.BLEND);
+        gl.depthMask(true);
     }
     getVertices() {
         return this._vertices;
@@ -189,5 +199,9 @@ class Objct {
     }
     getTriangles() {
         return this._triangles;
+    }
+    setAlpha(alpha) {
+        this._alpha = alpha;
+        return this;
     }
 }

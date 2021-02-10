@@ -1,7 +1,7 @@
 class GlShadowBuilder {
     constructor(opts) {
         this._renderer = opts.renderer;
-        this._object = opts.object;
+        this._objct = opts.objct;
         this._lineSides = [];
         this._glPositionBuffer = null;
         this._glVertexIndexBuffer = null;
@@ -41,7 +41,7 @@ class GlShadowBuilder {
      * Check which triangles face the light source...
     **/
     checkDirection(lightLocation) {
-        let triangles = this._object.getTriangles();
+        let triangles = this._objct.getTriangles();
         let triangle;
         let vector;
         let i = triangles.length;
@@ -62,10 +62,10 @@ class GlShadowBuilder {
      * Find the edge of the object...
     **/
     findEdge() {
-        let triangles = this._object.getTriangles();
+        let triangles = this._objct.getTriangles();
         let triangle;
         let a, b;
-        let lines = this._object.getLines();
+        let lines = this._objct.getLines();
         let line;
         let lineSides = this._lineSides;
         let lineSidesHash = {};
@@ -172,8 +172,8 @@ class GlShadowBuilder {
     **/
     createVolume(lightLocation) {
         let gl = this._renderer.getGl();
-        let vertices = this._object.getVertices();
-        let triangles = this._object.getTriangles();
+        let vertices = this._objct.getVertices();
+        let triangles = this._objct.getTriangles();
         let triangle;
         let lineSides = this._lineSides;
         let vector3 = vec3.create();
@@ -274,5 +274,9 @@ class GlShadowBuilder {
         gl.colorMask(true, true, true, true);
         gl.depthMask(true);
         gl.disable(gl.STENCIL_TEST);
+    }
+    setAlpha(alpha) {
+        this._objct.setAlpha(alpha);
+        return this;
     }
 }

@@ -4,6 +4,7 @@ const MODE_COLOR         = 1.0;
 const MODE_TEXTURE       = 2.0;
 const MODE_TEXTURE_FLAT  = 3.0;
 const MODE_TEXTURE_PHONG = 4.0;
+const MODE_TEXTURE_ALPHA = 5.0;
 
 interface IObjct {
     _vertices:             IGlVertices;       // List of unique vertices of the object
@@ -24,6 +25,7 @@ interface IObjct {
     _normalBuffer:         IBuffer;
     _textureCoordBuffer:   IBuffer;
     _indexBuffer:          IBuffer;
+    _alpha:                number;
     addVertex(x: number, y: number, z: number): number;
     addGLVertex(x: number, y: number, z: number, u: number, v: number): number;
     addNormal(normal: unknown): IObjct;
@@ -37,6 +39,7 @@ interface IObjct {
     getVertices(): IGlVertices;
     getLines(): INumberList;
     getTriangles(): INumberList;
+    setAlpha(alpha: number): IObjct;
 }
 
 interface IObjctOpts {
@@ -65,6 +68,7 @@ class Objct implements IObjct {
     _normalBuffer:         IBuffer;
     _textureCoordBuffer:   IBuffer;
     _indexBuffer:          IBuffer;
+    _alpha:                number;
 
     constructor(opts: IObjctOpts) {
         this._mode                 =  opts.mode;
@@ -86,6 +90,7 @@ class Objct implements IObjct {
         this._normalBuffer         =  null;
         this._textureCoordBuffer   =  null;
         this._indexBuffer          =  null;
+        this._alpha                =  1;
     }
 
     /**
@@ -246,12 +251,20 @@ class Objct implements IObjct {
         gl.bindTexture(gl.TEXTURE_2D, this._texture.getTexture());
         gl.uniform1i(renderer.getSamplerUniform(), 0);
         gl.uniform1f(renderer.getModeUniform(), this._mode);
+        if (this._mode === MODE_TEXTURE_ALPHA) {
+            gl.enable(gl.BLEND);
+            gl.depthMask(false);
+            gl.uniform1f(renderer.getAlphaUniform(), this._alpha);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        }
         renderer.setMatrixUniforms();
         this._colorBuffer.disable();
         this._positionBuffer.bind().enable();
         this._normalBuffer.bind().enable();
         this._textureCoordBuffer.bind().enable();
         this._indexBuffer.bind().draw();
+        gl.disable(gl.BLEND);
+        gl.depthMask(true);
     }
 
     getVertices(): IGlVertices {
@@ -264,5 +277,10 @@ class Objct implements IObjct {
 
     getTriangles(): INumberList {
         return this._triangles;
+    }
+
+    setAlpha(alpha: number): IObjct {
+        this._alpha = alpha;
+        return this;
     }
 }
