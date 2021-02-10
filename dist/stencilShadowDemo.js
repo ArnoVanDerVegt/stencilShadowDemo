@@ -28,12 +28,11 @@ class Demo {
         this._cubeAngle = 0;
         this._shadowAngle = 0;
         this._shadowOverlay = null;
-        this._light = new Light({ renderer: this._renderer });
         this._lastTime = 0;
-        this._fontTexture = new Texture({ renderer: renderer, src: 'images/font.png' });
-        this._fontCharacter = new FontCharacter({ renderer: renderer });
+        this._light = new Light({ renderer: this._renderer });
+        this._fontCharacters = new FontCharacters({ renderer: renderer, texture: new Texture({ renderer: renderer, src: 'images/font.png' }) });
         // Create a floor...
-        this.addShape(new Cube({ renderer: renderer, mode: MODE_TEXTURE_FLAT, texture: new Grey({ renderer: renderer }), sizeX: 15, sizeY: 1, sizeZ: 15 }), false);
+        this.addShape(new Cube({ renderer: renderer, mode: MODE_TEXTURE_PHONG, texture: new Grey({ renderer: renderer }), sizeX: 15, sizeY: 1, sizeZ: 15 }), false);
         //this.addShape(new Cube   ({renderer: renderer, mode: MODE_TEXTURE_FLAT,  texture: new Texture({renderer: renderer, src: 'images/font.png'}), sizeX: 15, sizeY: 1, sizeZ: 15}), false);
         // Create the rotating objects with colors...
         this.addShape(new Cube({ renderer: renderer, mode: MODE_TEXTURE_FLAT, texture: new RedGreen({ renderer: renderer }), sizeX: 1.5, sizeY: 1.5, sizeZ: 1.5 }), true);
@@ -133,7 +132,10 @@ class Demo {
             this._shadowOverlay = new ShadowOverlay({ renderer: renderer });
         }
         this._shadowOverlay.render();
-        this._fontCharacter.render(this._fontTexture);
+        this._fontCharacters
+            .setHAlign(FONT_HALIGN_CENTER)
+            .setVAlign(FONT_VALIGN_CENTER)
+            .render(50, 12.5, 'SHADOW DEMO');
     }
     ;
     /**

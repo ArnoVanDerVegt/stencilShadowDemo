@@ -159,10 +159,10 @@ interface IRenderer {
     getSamplerUniform(): number;
     identity(): any;
     initShaders(): void;
-    mvPushMatrix(): void;
-    mvPopMatrix(): void;
-    pPushMatrix(): void;
-    pPopMatrix(): void;
+    mvPushMatrix(): IRenderer;
+    mvPopMatrix(): IRenderer;
+    pPushMatrix(): IRenderer;
+    pPopMatrix(): IRenderer;
     onResize(): void;
 }
 
@@ -346,26 +346,30 @@ class Renderer implements IRenderer {
         return this._samplerUniform;
     }
 
-    mvPushMatrix(): void {
+    mvPushMatrix(): IRenderer {
         this._mvMatrixStack.push(mat4.clone(this._mvMatrix));
+        return this;
     }
 
-    mvPopMatrix(): void {
+    mvPopMatrix(): IRenderer {
         if (this._mvMatrixStack.length === 0) {
             throw 'Invalid popMatrix!';
         }
         this._mvMatrix = this._mvMatrixStack.pop();
+        return this;
     }
 
-    pPushMatrix(): void {
+    pPushMatrix(): IRenderer {
         this._pMatrixStack.push(mat4.clone(this._pMatrix));
+        return this;
     }
 
-    pPopMatrix(): void {
+    pPopMatrix(): IRenderer {
         if (this._pMatrixStack.length === 0) {
             throw 'Invalid popMatrix!';
         }
         this._pMatrix = this._pMatrixStack.pop();
+        return this;
     }
 
     onResize(): void {

@@ -248,21 +248,25 @@ class Renderer {
     }
     mvPushMatrix() {
         this._mvMatrixStack.push(mat4.clone(this._mvMatrix));
+        return this;
     }
     mvPopMatrix() {
         if (this._mvMatrixStack.length === 0) {
             throw 'Invalid popMatrix!';
         }
         this._mvMatrix = this._mvMatrixStack.pop();
+        return this;
     }
     pPushMatrix() {
         this._pMatrixStack.push(mat4.clone(this._pMatrix));
+        return this;
     }
     pPopMatrix() {
         if (this._pMatrixStack.length === 0) {
             throw 'Invalid popMatrix!';
         }
         this._pMatrix = this._pMatrixStack.pop();
+        return this;
     }
     onResize() {
         this._screenWidth = window.innerWidth;

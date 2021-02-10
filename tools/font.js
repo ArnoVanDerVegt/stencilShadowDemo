@@ -1,4 +1,4 @@
-const FONT = '128px Arial';
+const FONT = '128px Bangers';
 
 class CharacterScanner {
     constructor(opts) {
@@ -97,6 +97,7 @@ class CharacterScanner {
 class FontScanner {
     constructor(opts) {
         this._onFinished = opts.onFinished;
+        this._start      = 0;
     }
 
     scan() {
@@ -111,7 +112,11 @@ class FontScanner {
         if (ch < 127) {
             this.info('Scanning: "' + String.fromCharCode(ch) + '"');
             this._chars[ch] = this._characterScanner.render(String.fromCharCode(ch)).scan();
-            this._ch++;
+            if (this._start < 200) {
+                this._start++;
+            } else {
+                this._ch++;
+            }
             setTimeout(this.onScan.bind(this), 1);
         } else {
             this._ch = 33;

@@ -1,5 +1,3 @@
-declare var vec3: any;
-
 interface IFontCharacter {
     _renderer:           IRenderer;
     _colorBuffer:        IBuffer;
@@ -7,7 +5,7 @@ interface IFontCharacter {
     _positionBuffer:     IBuffer;
     _textureCoordBuffer: IBuffer;
     _indexBuffer:        IBuffer;
-    render(texture: any): void;
+    render(): void;
 }
 
 class FontCharacter implements IFontCharacter {
@@ -25,7 +23,7 @@ class FontCharacter implements IFontCharacter {
         let renderer        = opts.renderer;
         let gl              = renderer.getGl();
         let shaderProgram   = renderer.getShaderProgram();
-        let ch              = charInfo[65];
+        let ch              = charInfo[opts.ch];
         let glVertices      = [0, 0, 0, ch.width, 0, 0, ch.width, ch.height, 0, 0, ch.height, 0];
         let glIndices       = [0, 1, 2,  2, 3, 0];
         let glTextureCoords = [ch.x, ch.y, ch.x + ch.width, ch.y, ch.x + ch.width, ch.y + ch.height, ch.x, ch.y + ch.height];
@@ -43,36 +41,11 @@ class FontCharacter implements IFontCharacter {
     /**
      * This function darkens the spots which are covered by shadows...
     **/
-    render(texture: any): void {
-        if (!texture.getReady()) {
-            return;
-        }
-        let renderer = this._renderer;
-        let gl       = renderer.getGl();
-        renderer.mvPushMatrix();
-            gl.depthMask(false);
-            gl.disable(gl.CULL_FACE);
-            gl.disable(gl.DEPTH_TEST);
-            gl.enable(gl.BLEND);
-            gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-            renderer.pPushMatrix();
-                mat4.ortho(renderer.getPMatrix(), 0, renderer.getViewportWidth(), renderer.getViewportHeight(), 0, 0, -100);
-                let mvMatrix = renderer.identity();
-                //mat4.translate(mvMatrix, mvMatrix, [renderer.getViewportWidth() / 2, 0, 0]);
-                gl.activeTexture(gl.TEXTURE0);
-                gl.bindTexture(gl.TEXTURE_2D, texture.getTexture());
-                gl.uniform1i(renderer.getSamplerUniform(), 0);
-                gl.uniform1f(renderer.getModeUniform(), MODE_TEXTURE);
-                gl.uniform1f(renderer.getAlphaUniform(), 1);
-                renderer.setMatrixUniforms();
-                this._colorBuffer.disable();
-                this._normalBuffer.disable();
-                this._positionBuffer.bind().enable();
-                this._textureCoordBuffer.bind().enable();
-                this._indexBuffer.bind().draw();
-            renderer.pPopMatrix();
-            gl.disable(gl.BLEND);
-            gl.depthMask(true);
-        renderer.mvPopMatrix();
+    render(): void {
+        this._colorBuffer.disable();
+        this._normalBuffer.disable();
+        this._positionBuffer.bind().enable();
+        this._textureCoordBuffer.bind().enable();
+        this._indexBuffer.bind().draw();
     }
 }
