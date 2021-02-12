@@ -62,7 +62,7 @@ class Engine implements IEngine {
         let renderer = this._renderer;
         this._shapeInstances.forEach((shapeInstance) => {
             let shadowBuilderList = this._shapeList[shapeInstance.shape];
-            if (types.indexOf(shadowBuilderList.getMode()) !== -1) {
+            if (types.indexOf(shadowBuilderList.getColorMode()) !== -1) {
                 renderer.mvPushMatrix();
                 this.applyShapeInstance(shapeInstance);
                 shadowBuilderList
@@ -105,8 +105,8 @@ class Engine implements IEngine {
         this.updateCamera();
         // Render all objects...
         this
-            .renderShapeInstances([MODE_TEXTURE, MODE_TEXTURE_FLAT, MODE_TEXTURE_PHONG])
-            .renderShapeInstances([MODE_TEXTURE_ALPHA])
+            .renderShapeInstances([ColorMode.Texture, ColorMode.TextureFlat, ColorMode.TexturePhong])
+            .renderShapeInstances([ColorMode.TextureAlpha])
             .renderShadows();
         this._shadowOverlay.render();
         this._shapeInstances.length = 0;

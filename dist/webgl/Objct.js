@@ -1,11 +1,15 @@
-const MODE_COLOR = 1.0;
-const MODE_TEXTURE = 2.0;
-const MODE_TEXTURE_FLAT = 3.0;
-const MODE_TEXTURE_PHONG = 4.0;
-const MODE_TEXTURE_ALPHA = 5.0;
+var ColorMode;
+(function (ColorMode) {
+    ColorMode[ColorMode["Color"] = 1] = "Color";
+    ColorMode[ColorMode["Texture"] = 2] = "Texture";
+    ColorMode[ColorMode["TextureFlat"] = 3] = "TextureFlat";
+    ColorMode[ColorMode["TexturePhong"] = 4] = "TexturePhong";
+    ColorMode[ColorMode["TextureAlpha"] = 5] = "TextureAlpha";
+})(ColorMode || (ColorMode = {}));
+;
 class Objct {
     constructor(opts) {
-        this._mode = opts.mode;
+        this._colorMode = opts.colorMode;
         this._renderer = opts.renderer;
         this._texture = opts.texture;
         this._vertices = [];
@@ -129,7 +133,7 @@ class Objct {
     createBuffers() {
         let gl = this._renderer.getGl();
         let shaderProgram = this._renderer.getShaderProgram();
-        let normals = (this._mode === MODE_TEXTURE_PHONG) ? this.getVertexNormals() : this._glNormals;
+        let normals = (this._colorMode === ColorMode.TexturePhong) ? this.getVertexNormals() : this._glNormals;
         this._colorBuffer = new Buffer({ gl: gl, type: gl.ARRAY_BUFFER, itemSize: 0, attribute: shaderProgram.vertexColorAttribute });
         this._normalBuffer = new Buffer({ gl: gl, type: gl.ARRAY_BUFFER, itemSize: 3, attribute: shaderProgram.vertexNormalAttribute }).create(normals);
         this._positionBuffer = new Buffer({ gl: gl, type: gl.ARRAY_BUFFER, itemSize: 3, attribute: shaderProgram.vertexPositionAttribute }).create(this._glVertices);
@@ -173,8 +177,8 @@ class Objct {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this._texture.getTexture());
         gl.uniform1i(renderer.getSamplerUniform(), 0);
-        gl.uniform1f(renderer.getModeUniform(), this._mode);
-        if (this._mode === MODE_TEXTURE_ALPHA) {
+        gl.uniform1f(renderer.getModeUniform(), this._colorMode);
+        if (this._colorMode === ColorMode.TextureAlpha) {
             gl.enable(gl.BLEND);
             // gl.depthMask(false);
             gl.uniform1f(renderer.getAlphaUniform(), this._alpha);
@@ -207,7 +211,7 @@ class Objct {
         this._alpha = alpha;
         return this;
     }
-    getMode() {
-        return this._mode;
+    getColorMode() {
+        return this._colorMode;
     }
 }

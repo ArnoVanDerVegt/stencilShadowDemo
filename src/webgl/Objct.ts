@@ -1,13 +1,15 @@
 declare var vec3: any;
 
-const MODE_COLOR         = 1.0;
-const MODE_TEXTURE       = 2.0;
-const MODE_TEXTURE_FLAT  = 3.0;
-const MODE_TEXTURE_PHONG = 4.0;
-const MODE_TEXTURE_ALPHA = 5.0;
+enum ColorMode {
+    Color        = 1,
+    Texture      = 2,
+    TextureFlat  = 3,
+    TexturePhong = 4,
+    TextureAlpha = 5
+};
 
 interface IObjct {
-    _mode:                 number;
+    _colorMode:            number;
     _vertices:             IGlVertices;       // List of unique vertices of the object
     _verticesHash:         INumberHashMap;    // Hash list of vertices
     _vertexNormal:         INumberNumberList;
@@ -41,18 +43,18 @@ interface IObjct {
     getLines(): INumberList;
     getTriangles(): INumberList;
     setAlpha(alpha: number): IObjct;
-    getMode(): number;
+    getColorMode(): number;
     render(): void;
 }
 
 interface IObjctOpts {
-    renderer: IRenderer;
-    texture:  ITexture;
-    mode:     number;
+    renderer:  IRenderer;
+    texture:   ITexture;
+    colorMode: number;
 }
 
 class Objct implements IObjct {
-    _mode:                 number;
+    _colorMode:            number;
     _vertices:             IGlVertices;       // List of unique vertices of the object
     _verticesHash:         INumberHashMap;    // Hash list of vertices
     _vertexNormal:         INumberNumberList;
@@ -74,7 +76,7 @@ class Objct implements IObjct {
     _alpha:                number;
 
     constructor(opts: IObjctOpts) {
-        this._mode                 =  opts.mode;
+        this._colorMode            =  opts.colorMode;
         this._renderer             =  opts.renderer;
         this._texture              =  opts.texture;
         this._vertices             =  [];
@@ -206,7 +208,7 @@ class Objct implements IObjct {
     createBuffers(): void {
         let gl            = this._renderer.getGl();
         let shaderProgram = this._renderer.getShaderProgram();
-        let normals       = (this._mode === MODE_TEXTURE_PHONG) ? this.getVertexNormals() : this._glNormals;
+        let normals       = (this._colorMode === ColorMode.TexturePhong) ? this.getVertexNormals() : this._glNormals;
         this._colorBuffer        = new Buffer({gl: gl, type: gl.ARRAY_BUFFER,         itemSize: 0, attribute: shaderProgram.vertexColorAttribute   });
         this._normalBuffer       = new Buffer({gl: gl, type: gl.ARRAY_BUFFER,         itemSize: 3, attribute: shaderProgram.vertexNormalAttribute  }).create(normals);
         this._positionBuffer     = new Buffer({gl: gl, type: gl.ARRAY_BUFFER,         itemSize: 3, attribute: shaderProgram.vertexPositionAttribute}).create(this._glVertices);
@@ -251,8 +253,8 @@ class Objct implements IObjct {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this._texture.getTexture());
         gl.uniform1i(renderer.getSamplerUniform(), 0);
-        gl.uniform1f(renderer.getModeUniform(), this._mode);
-        if (this._mode === MODE_TEXTURE_ALPHA) {
+        gl.uniform1f(renderer.getModeUniform(), this._colorMode);
+        if (this._colorMode === ColorMode.TextureAlpha) {
             gl.enable(gl.BLEND);
             // gl.depthMask(false);
             gl.uniform1f(renderer.getAlphaUniform(), this._alpha);
@@ -289,7 +291,7 @@ class Objct implements IObjct {
         return this;
     }
 
-    getMode(): number {
-        return this._mode;
+    getColorMode(): number {
+        return this._colorMode;
     }
 }

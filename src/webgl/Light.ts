@@ -20,7 +20,7 @@ class Light implements ILight {
     constructor(opts: ILightOpts) {
         this._renderer = opts.renderer;
         // Create a small cube to show the light position...
-        this._cube = new Box({renderer: opts.renderer, mode: MODE_TEXTURE_FLAT, texture: new Texture({renderer: this._renderer, color1: '#FFFFFF', color2: '#FFDD00'}), sizeX: 0.2, sizeY: 0.2, sizeZ: 0.2});
+        this._cube = new Box({renderer: opts.renderer, colorMode: ColorMode.TextureFlat, texture: new Texture({renderer: this._renderer, color1: '#FFFFFF', color2: '#FFDD00'}), sizeX: 0.2, sizeY: 0.2, sizeZ: 0.2});
     }
 
     /**
@@ -39,7 +39,7 @@ class Light implements ILight {
             gl.stencilFunc(gl.NEVER, 0, 255);
             // Set alpha, disable lighting...
             gl.uniform1f(renderer.getAlphaUniform(), 1);
-            gl.uniform1f(renderer.getModeUniform(), MODE_TEXTURE);
+            gl.uniform1f(renderer.getModeUniform(), ColorMode.Texture);
             // Render the cube...
             this._cube.render();
             // Set the light position, color and the ambient color...

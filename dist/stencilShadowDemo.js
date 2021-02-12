@@ -24,13 +24,13 @@ class Demo extends Engine {
         let starTexture = new StarTexture({ renderer: renderer });
         this._fontCharacters = new FontCharacters({ renderer: renderer, texture: new Texture({ renderer: renderer, src: 'images/font.png' }) });
         this
-            .addShape(new Floor({ renderer: renderer, mode: MODE_TEXTURE_PHONG, texture: floorTexture, sizeX: 40, sizeY: 1, sizeZ: 40 }), false)
-            .addShape(new Water({ renderer: renderer, mode: MODE_TEXTURE_ALPHA, texture: waterTexture, sizeX: 40, sizeY: 1, sizeZ: 40 }), false)
-            .addShape(new PineTree({ renderer: renderer, mode: MODE_TEXTURE_FLAT, texture: pineTreeTexture, sizeX: 2, sizeY: 10, sizeZ: 2 }), true)
-            .addShape(new PineTree({ renderer: renderer, mode: MODE_TEXTURE_FLAT, texture: pineTreeTexture, sizeX: 2.5, sizeY: 12, sizeZ: 2.5 }), true)
-            .addShape(new PineTree({ renderer: renderer, mode: MODE_TEXTURE_FLAT, texture: pineTreeTexture, sizeX: 1.5, sizeY: 8, sizeZ: 1.5 }), true)
-            .addShape(new Box({ renderer: renderer, mode: MODE_TEXTURE_FLAT, texture: boxTexture, sizeX: 2, sizeY: 2, sizeZ: 2 }), true)
-            .addShape(new Star({ renderer: renderer, mode: MODE_TEXTURE_FLAT, texture: starTexture, sizeX: 1, sizeY: 1, sizeZ: 0.25 }), true);
+            .addShape(new Floor({ renderer: renderer, colorMode: ColorMode.Texture, texture: floorTexture, sizeX: 40, sizeY: 1, sizeZ: 40 }), false)
+            .addShape(new Water({ renderer: renderer, colorMode: ColorMode.TextureAlpha, texture: waterTexture, sizeX: 40, sizeY: 1, sizeZ: 40 }), false)
+            .addShape(new PineTree({ renderer: renderer, colorMode: ColorMode.TextureFlat, texture: pineTreeTexture, sizeX: 2, sizeY: 10, sizeZ: 2 }), true)
+            .addShape(new PineTree({ renderer: renderer, colorMode: ColorMode.TextureFlat, texture: pineTreeTexture, sizeX: 2.5, sizeY: 12, sizeZ: 2.5 }), true)
+            .addShape(new PineTree({ renderer: renderer, colorMode: ColorMode.TextureFlat, texture: pineTreeTexture, sizeX: 1.5, sizeY: 8, sizeZ: 1.5 }), true)
+            .addShape(new Box({ renderer: renderer, colorMode: ColorMode.TextureFlat, texture: boxTexture, sizeX: 2, sizeY: 2, sizeZ: 2 }), true)
+            .addShape(new Star({ renderer: renderer, colorMode: ColorMode.TextureFlat, texture: starTexture, sizeX: 1, sizeY: 1, sizeZ: 0.25 }), true);
     }
     ;
     /**

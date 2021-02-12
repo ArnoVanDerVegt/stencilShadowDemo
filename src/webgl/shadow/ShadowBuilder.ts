@@ -19,7 +19,7 @@ interface IShadowBuilder {
     createVolume(lightLocation: INumberList): void;
     render(): void;
     setAlpha(alpha: number): IShadowBuilder;
-    getMode(): number;
+    getColorMode(): number;
 }
 
 interface GlShadowBuilderOpts {
@@ -324,7 +324,7 @@ class GlShadowBuilder implements IShadowBuilder {
         return this;
     }
 
-    getMode(): number {
-        return this._objct.getMode();
+    getColorMode(): number {
+        return this._objct.getColorMode();
     }
 }

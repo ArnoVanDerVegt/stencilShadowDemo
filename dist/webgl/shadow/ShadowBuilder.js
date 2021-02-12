@@ -280,7 +280,7 @@ class GlShadowBuilder {
         this._objct.setAlpha(alpha);
         return this;
     }
-    getMode() {
-        return this._objct.getMode();
+    getColorMode() {
+        return this._objct.getColorMode();
     }
 }
