@@ -4,7 +4,7 @@ class StarTexture extends Texture {
         let context = canvas.getContext('2d');
         canvas.width      = 128;
         canvas.height     = 128;
-        context.fillStyle = '#FFFFFF';
+        context.fillStyle = '#FFCC00';
         context.fillRect(0, 0, 128, 128);
         context.strokeStyle = '#FF0000';
         for (let i = 0; i < 5; i++) {

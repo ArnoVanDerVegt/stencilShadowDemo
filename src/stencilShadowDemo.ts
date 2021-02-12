@@ -43,15 +43,15 @@ class Demo extends Engine {
     render(): void {
         let a = Date.now() / -400;
         this._shapeInstances.push(
-            {shape:1, location:[ 0.0,  0.0,  0.0], angle:[0, 0, 0], alpha: 0.5},
-            {shape:0, location:[ 0.0,  0.0,  0.0], angle:[0, 0, 0], alpha: 1.0},
-            {shape:2, location:[ 1.0,  1.5,  2.0], angle:[0, 0, 0], alpha: 1.0},
-            {shape:2, location:[ 3.0,  1.5, -2.0], angle:[0, 0, 0], alpha: 1.0},
-            {shape:3, location:[-2.0,  1.5,  3.0], angle:[0, 0, 0], alpha: 1.0},
-            {shape:4, location:[-1.0,  1.5, -2.0], angle:[0, 0, 0], alpha: 1.0},
-            {shape:5, location:[ 4.0,  1.5,  3.0], angle:[0, 1, 0], alpha: 1.0},
-            {shape:5, location:[-4.5,  1.5,  4.0], angle:[0, 2, 0], alpha: 1.0},
-            {shape:6, location:[-4.0,  5.0, -3.0], angle:[0, a, 0], alpha: 1.0}
+            {shape:1, location:[ 0.0,  0.0,  0.0], angle:[0, 0, 0], alpha: 0.8, vertexMode: VertexMode.Water},
+            {shape:0, location:[ 0.0,  0.0,  0.0], angle:[0, 0, 0], alpha: 1.0, vertexMode: VertexMode.Default},
+            {shape:2, location:[ 1.0,  1.5,  2.0], angle:[0, 0, 0], alpha: 1.0, vertexMode: VertexMode.Default},
+            {shape:2, location:[ 3.0,  1.5, -2.0], angle:[0, 0, 0], alpha: 1.0, vertexMode: VertexMode.Default},
+            {shape:3, location:[-2.0,  1.5,  3.0], angle:[0, 0, 0], alpha: 1.0, vertexMode: VertexMode.Default},
+            {shape:4, location:[-1.0,  1.5, -2.0], angle:[0, 0, 0], alpha: 1.0, vertexMode: VertexMode.Default},
+            {shape:5, location:[ 4.0,  1.5,  3.0], angle:[0, 1, 0], alpha: 1.0, vertexMode: VertexMode.Default},
+            {shape:5, location:[-4.5,  1.5,  4.0], angle:[0, 2, 0], alpha: 1.0, vertexMode: VertexMode.Default},
+            {shape:6, location:[-4.0,  5.0, -3.0], angle:[0, a, 0], alpha: 1.0, vertexMode: VertexMode.Default}
         );
         super.render();
         this._fontCharacters

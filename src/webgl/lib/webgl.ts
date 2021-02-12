@@ -49,6 +49,7 @@ interface IGl {
     LINEAR:                number;
     LINK_STATUS:           string;
     NEVER:                 number;
+    NEAREST:               number;
     NOTEQUAL:              number;
     ONE:                   number;
     ONE_MINUS_SRC_ALPHA:   number;

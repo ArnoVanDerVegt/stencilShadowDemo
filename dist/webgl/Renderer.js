@@ -1,41 +1,3 @@
-/*
-        void main(void) {
-            float scale  = 0.01;
-            float angleX = aVertexPosition[0] + uAngleX;
-            float sinX   = sin(angleX * scale);
-            float cosX   = cos(angleX * scale);
-            float angleZ = aVertexPosition[2] + uAngleZ;
-            float sinZ   = sin(angleZ * scale);
-            float cosZ   = cos(angleZ * scale);
-
-            vec3 p0 = vec3(0, 50.0 + aVertexPosition[1] * 0.7, 0);
-            vec3 p1;
-            vec3 p2;
-
-            p1[1] = p0[1] * cosX - p0[2] * sinX;
-            p2[0] = p0[0] * cosZ - p1[1] * sinZ;
-            p2[1] = p0[0] * sinZ + p1[1] * cosZ - 50.0;
-            p2[2] = p0[1] * sinX + p0[2] * cosX;
-
-            if (uUsePolar) {
-                vec4 mvPosition = uMVMatrix * vec4(p2, 1.0);
-                gl_Position     = uPMatrix * mvPosition;
-                vTextureCoord1  = aTextureCoord1;
-                vTextureCoord2  = aTextureCoord2;
-                if (!uUseLighting) {
-                    vLightWeighting = vec3(0.4, 0.4, 0.4);
-                } else {
-                    vec3  lightDirection            = normalize(uLightingLocation - mvPosition.xyz);
-                    vec3  transformedNormal         = uNMatrix * aVertexNormal;
-                    float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);
-                    vLightWeighting = uAmbientColor + uLightingColor * directionalLightWeighting;
-                }
-            } else {
-                vTextureCoord1 = aTextureCoord1;
-                gl_Position    = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-            }
-            vColor = aVertexColor;
-*/
 const FRAGMENT_SHADER = `
         #ifdef GL_ES
         precision highp float;
@@ -47,6 +9,9 @@ const FRAGMENT_SHADER = `
         const float MODE_TEXTURE_PHONG = 4.0;
         const float MODE_TEXTURE_ALPHA = 5.0;
 
+        const float VERTEX_MODE_DEFAULT = 0.0;
+        const float VERTEX_MODE_WATER   = 1.0;
+
         const float cShininess        = 500.0;
         const vec3  cLightDirection   = vec3(0.0, -1.0, -1.0);
         const vec4  cLightAmbient     = vec4(0.1,  0.1,  0.1,  1.0);
@@ -55,27 +20,29 @@ const FRAGMENT_SHADER = `
         const vec4  cMaterialAmbient  = vec4(1.0,  1.0,  1.0,  1.0);
         const vec4  cMaterialSpecular = vec4(1.0,  1.0,  1.0,  1.0);
 
-        varying vec2 vTextureCoord;
-        varying vec3 vLightWeighting;
-        varying vec4 vColor;
-        varying vec3 vNormal;
-        varying vec3 vEyeVec;
+        varying vec2  vTextureCoord;
+        varying vec3  vLightWeighting;
+        varying vec4  vColor;
+        varying vec3  vNormal;
+        varying vec3  vEyeVec;
+        varying float vWaterAdd;
 
-        uniform float     uMode;
+        uniform float     uColorMode;
         uniform sampler2D uSampler;
         uniform float     uAlpha;
+        uniform float     uVertexMode;
 
         void main(void) {
             vec4 textureColor;
-            if (uMode == MODE_COLOR) {
+            if (uColorMode == MODE_COLOR) {
                 gl_FragColor = vColor * uAlpha;
-            } else if (uMode == MODE_TEXTURE) {
+            } else if (uColorMode == MODE_TEXTURE) {
                 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
                 gl_FragColor = textureColor;
-            } else if (uMode == MODE_TEXTURE_FLAT) {
+            } else if (uColorMode == MODE_TEXTURE_FLAT) {
                 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
                 gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
-            } else if (uMode == MODE_TEXTURE_PHONG) {
+            } else if (uColorMode == MODE_TEXTURE_PHONG) {
                 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
                 vec3  L           = normalize(cLightDirection);
                 vec3  N           = normalize(vNormal);
@@ -93,9 +60,13 @@ const FRAGMENT_SHADER = `
                 vec4 color = Ia + Id + Is;
                 color.a = 1.0;
                 gl_FragColor = color;
-            } else if (uMode == MODE_TEXTURE_ALPHA) {
+            } else if (uColorMode == MODE_TEXTURE_ALPHA) {
                 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-                gl_FragColor = vec4(textureColor.rgb, uAlpha);
+                float alpha = uAlpha;
+                if (uVertexMode == VERTEX_MODE_WATER) {
+                    alpha = alpha * 0.75 + alpha * vWaterAdd * 0.25;
+                }
+                gl_FragColor = vec4(textureColor.rgb, alpha);
             }
         }
     `;
@@ -105,6 +76,10 @@ const VERTEX_SHADER = `
         const float MODE_TEXTURE_FLAT  = 3.0;
         const float MODE_TEXTURE_PHONG = 4.0;
         const float MODE_TEXTURE_ALPHA = 5.0;
+
+        const float VERTEX_MODE_DEFAULT = 0.0;
+        const float VERTEX_MODE_WATER   = 1.0;
+
         const float Z_ROUND_FIX        = 0.0001;
 
         attribute vec3 aVertexPosition;
@@ -118,24 +93,34 @@ const VERTEX_SHADER = `
         uniform vec3  uAmbientColor;
         uniform vec3  uLightingLocation;
         uniform vec3  uLightingColor;
-        uniform float uMode;
+        uniform float uColorMode;
+        uniform float uVertexMode;
+        uniform float uWaterOffset;
 
-        varying vec2 vTextureCoord;
-        varying vec3 vLightWeighting;
-        varying vec4 vColor;
-        varying vec3 vNormal;
-        varying vec3 vEyeVec;
+        varying vec2  vTextureCoord;
+        varying vec3  vLightWeighting;
+        varying vec4  vColor;
+        varying vec3  vNormal;
+        varying vec3  vEyeVec;
+        varying float vWaterAdd;
 
         void main(void) {
             vec4 mvPosition;
             vec4 vertex = vec4(aVertexPosition, 1.0);
-            if (uMode == MODE_COLOR) {
+            if (uVertexMode == VERTEX_MODE_WATER) {
+                if (vertex[1] == 1.0) {
+                    float waterAdd = sin(sin(vertex[0] * 0.2 + uWaterOffset) + vertex[2] * 0.3 + uWaterOffset) * 0.3;
+                    vertex[1] += waterAdd;
+                    vWaterAdd = 0.7 + waterAdd;
+                }
+            }
+            if (uColorMode == MODE_COLOR) {
                 gl_Position   = uPMatrix * uMVMatrix * vertex;
                 vColor        = aVertexColor;
-            } else if (uMode == MODE_TEXTURE) {
+            } else if (uColorMode == MODE_TEXTURE) {
                 gl_Position   = uPMatrix * uMVMatrix * vertex;
                 vTextureCoord = aTextureCoord;
-            } else if (uMode == MODE_TEXTURE_FLAT) {
+            } else if (uColorMode == MODE_TEXTURE_FLAT) {
                 mvPosition    = uMVMatrix * vertex;
                 gl_Position   = uPMatrix * mvPosition;
                 gl_Position.z += Z_ROUND_FIX;
@@ -144,14 +129,14 @@ const VERTEX_SHADER = `
                 vec3  transformedNormal         = uNMatrix * aVertexNormal;
                 float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);
                 vLightWeighting = uAmbientColor + uLightingColor * directionalLightWeighting;
-            } else if (uMode == MODE_TEXTURE_PHONG) {
+            } else if (uColorMode == MODE_TEXTURE_PHONG) {
                 mvPosition    = uMVMatrix * vertex;
                 gl_Position   = uPMatrix * mvPosition;
                 gl_Position.z += Z_ROUND_FIX;
                 vTextureCoord = aTextureCoord;
                 vNormal       = uNMatrix * aVertexNormal;
                 vEyeVec       = -vec3(mvPosition.xyz);
-            } else if (uMode == MODE_TEXTURE_ALPHA) {
+            } else if (uColorMode == MODE_TEXTURE_ALPHA) {
                 gl_Position   = uPMatrix * uMVMatrix * vertex;
                 vTextureCoord = aTextureCoord;
             }
@@ -242,7 +227,9 @@ class Renderer {
         this._mvMatrixUniform = gl.getUniformLocation(shaderProgram, 'uMVMatrix');
         this._nMatrixUniform = gl.getUniformLocation(shaderProgram, 'uNMatrix');
         this._samplerUniform = gl.getUniformLocation(shaderProgram, 'uSampler');
-        this._modeUniform = gl.getUniformLocation(shaderProgram, 'uMode');
+        this._colorModeUniform = gl.getUniformLocation(shaderProgram, 'uColorMode');
+        this._vertexModeUniform = gl.getUniformLocation(shaderProgram, 'uVertexMode');
+        this._waterOffsetUniform = gl.getUniformLocation(shaderProgram, 'uWaterOffset');
         this._alphaUniform = gl.getUniformLocation(shaderProgram, 'uAlpha');
         this._ambientColorUniform = gl.getUniformLocation(shaderProgram, 'uAmbientColor');
         this._lightingLocationUniform = gl.getUniformLocation(shaderProgram, 'uLightingLocation');
@@ -282,8 +269,14 @@ class Renderer {
     getAlphaUniform() {
         return this._alphaUniform;
     }
-    getModeUniform() {
-        return this._modeUniform;
+    getColorModeUniform() {
+        return this._colorModeUniform;
+    }
+    getVertexModeUniform() {
+        return this._vertexModeUniform;
+    }
+    getWaterOffsetUniform() {
+        return this._waterOffsetUniform;
     }
     getLightingLocationUniform() {
         return this._lightingLocationUniform;

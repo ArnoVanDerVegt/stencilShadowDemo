@@ -60,17 +60,20 @@ class Engine implements IEngine {
 
     renderShapeInstances(types: INumberList): IEngine {
         let renderer = this._renderer;
+        let gl       = renderer.getGl();
         this._shapeInstances.forEach((shapeInstance) => {
             let shadowBuilderList = this._shapeList[shapeInstance.shape];
             if (types.indexOf(shadowBuilderList.getColorMode()) !== -1) {
                 renderer.mvPushMatrix();
                 this.applyShapeInstance(shapeInstance);
+                gl.uniform1f(renderer.getVertexModeUniform(), shapeInstance.vertexMode);
                 shadowBuilderList
                     .setAlpha(shapeInstance.alpha)
                     .render();
                 renderer.mvPopMatrix();
             }
         });
+        gl.uniform1f(renderer.getVertexModeUniform(), VertexMode.Default);
         return this;
     }
 
@@ -99,6 +102,7 @@ class Engine implements IEngine {
         let renderer       = this._renderer;
         let gl             = renderer.getGl();
         let shaderProgram  = renderer.getShaderProgram();
+        gl.uniform1f(renderer.getWaterOffsetUniform(), ((Date.now() * 0.02) % 100) * Math.PI / 50);
         gl.viewport(0, 0, renderer.getViewportWidth(), renderer.getViewportHeight());
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
         mat4.perspective(renderer.getPMatrix(), 45, renderer.getScreenWidth() / renderer.getScreenHeight(), 0.1, 100.0);

@@ -8,6 +8,11 @@ enum ColorMode {
     TextureAlpha = 5
 };
 
+enum VertexMode {
+    Default = 0,
+    Water   = 1
+}
+
 interface IObjct {
     _colorMode:            number;
     _vertices:             IGlVertices;       // List of unique vertices of the object
@@ -253,7 +258,7 @@ class Objct implements IObjct {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this._texture.getTexture());
         gl.uniform1i(renderer.getSamplerUniform(), 0);
-        gl.uniform1f(renderer.getModeUniform(), this._colorMode);
+        gl.uniform1f(renderer.getColorModeUniform(), this._colorMode);
         if (this._colorMode === ColorMode.TextureAlpha) {
             gl.enable(gl.BLEND);
             // gl.depthMask(false);

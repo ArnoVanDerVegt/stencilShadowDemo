@@ -15,10 +15,13 @@
 **/
 class Texture {
     constructor(opts) {
+        let gl = opts.renderer.getGl();
         this._renderer = opts.renderer;
         this._color1 = opts.color1;
         this._color2 = opts.color2;
         this._src = opts.src || '';
+        this._magFilter = opts.magFilter || gl.LINEAR;
+        this._minFilter = opts.minFilter || gl.LINEAR_MIPMAP_NEAREST;
         this._ready = false;
         this.createTexture();
     }
@@ -47,8 +50,8 @@ class Texture {
         this._texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this._texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this._magFilter); // gl.NEAREST);//LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._minFilter); // gl.NEAREST);//LINEAR_MIPMAP_NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.generateMipmap(gl.TEXTURE_2D);

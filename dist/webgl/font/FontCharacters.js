@@ -88,7 +88,7 @@ class FontCharacters {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this._texture.getTexture());
         gl.uniform1i(renderer.getSamplerUniform(), 0);
-        gl.uniform1f(renderer.getModeUniform(), ColorMode.Texture);
+        gl.uniform1f(renderer.getColorModeUniform(), ColorMode.Texture);
         gl.uniform1f(renderer.getAlphaUniform(), 1);
         renderer
             .pPushMatrix()

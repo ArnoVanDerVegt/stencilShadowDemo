@@ -7,6 +7,11 @@ var ColorMode;
     ColorMode[ColorMode["TextureAlpha"] = 5] = "TextureAlpha";
 })(ColorMode || (ColorMode = {}));
 ;
+var VertexMode;
+(function (VertexMode) {
+    VertexMode[VertexMode["Default"] = 0] = "Default";
+    VertexMode[VertexMode["Water"] = 1] = "Water";
+})(VertexMode || (VertexMode = {}));
 class Objct {
     constructor(opts) {
         this._colorMode = opts.colorMode;
@@ -177,7 +182,7 @@ class Objct {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this._texture.getTexture());
         gl.uniform1i(renderer.getSamplerUniform(), 0);
-        gl.uniform1f(renderer.getModeUniform(), this._colorMode);
+        gl.uniform1f(renderer.getColorModeUniform(), this._colorMode);
         if (this._colorMode === ColorMode.TextureAlpha) {
             gl.enable(gl.BLEND);
             // gl.depthMask(false);

@@ -57,24 +57,17 @@ class ShadowOverlay implements IShadowOverlay {
             gl.blendFunc(gl.ONE, gl.SRC_ALPHA);                  // Enable blending...
             gl.enable(gl.STENCIL_TEST);                          // The stencil buffer contains the shadow values...
             gl.enable(gl.BLEND);
-            gl.uniform1f(renderer.getModeUniform(), ColorMode.Color); // Enable color...
+            gl.uniform1f(renderer.getColorModeUniform(), ColorMode.Color); // Enable color...
             // Render 2D...
             renderer.pPushMatrix();
                 mat4.ortho(renderer.getPMatrix(), 0, renderer.getViewportWidth(), renderer.getViewportHeight(), 0, 0, -100);
                 let mvMatrix = renderer.identity();
                 //mat4.translate(mvMatrix, mvMatrix, [renderer.getViewportWidth() / 2, 0, 0]);
                 renderer.setMatrixUniforms();
-                // Render 3 passes, each pas with a darker alpha value...
-                let stencil = 128;
-                while (stencil < 132) {
-                    stencil++;
-                    // The stencil value controls the darkness,
-                    // with each shadow the stencil buffer is increased.
-                    // When more shadows overlap the shadow gets darker.
-                    gl.stencilFunc(gl.EQUAL, stencil, 255);
-                    gl.uniform1f(renderer.getAlphaUniform(), 0.8 - (stencil - 129) * 0.1);
-                    this._indexBuffer.draw();
-                }
+                // Darken the shadow areas...
+                gl.stencilFunc(gl.NOTEQUAL, 128, 255);
+                gl.uniform1f(renderer.getAlphaUniform(), 0.8);
+                this._indexBuffer.draw();
                 gl.depthMask(true); // Enable depth buffer updates again...
                 gl.disable(gl.BLEND);
                 gl.disable(gl.STENCIL_TEST);
