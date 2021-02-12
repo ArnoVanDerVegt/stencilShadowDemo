@@ -20,7 +20,7 @@ class Light implements ILight {
     constructor(opts: ILightOpts) {
         this._renderer = opts.renderer;
         // Create a small cube to show the light position...
-        this._cube = new Cube({renderer: opts.renderer, mode: MODE_TEXTURE_FLAT, texture: new Texture({renderer: this._renderer, color1: '#FFFFFF', color2: '#FFDD00'}), sizeX: 0.2, sizeY: 0.2, sizeZ: 0.2});
+        this._cube = new Box({renderer: opts.renderer, mode: MODE_TEXTURE_FLAT, texture: new Texture({renderer: this._renderer, color1: '#FFFFFF', color2: '#FFDD00'}), sizeX: 0.2, sizeY: 0.2, sizeZ: 0.2});
     }
 
     /**

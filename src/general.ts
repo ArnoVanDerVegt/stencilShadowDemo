@@ -4,6 +4,7 @@ interface INumberList {
     push(...args: any[]);
     pop(): any;
     forEach(...args: any[]);
+    indexOf(number): number;
 }
 
 interface INumberNumberList {
@@ -18,6 +19,7 @@ interface IAnyList {
     [index:number]: any;
     length:         number;
     push(...args: any[]);
+    forEach(...args: any[]);
 }
 
 interface INumberHashMap {

@@ -166,6 +166,7 @@ class GlShadowBuilder {
             .setupData() // Reset all lists and buffers...
             .checkDirection(vector) // Check which triangles face the light source...
             .findEdge(); // Find the edge...
+        return this;
     }
     /**
      * Create the buffers for the shadow volume...
@@ -278,5 +279,8 @@ class GlShadowBuilder {
     setAlpha(alpha) {
         this._objct.setAlpha(alpha);
         return this;
+    }
+    getMode() {
+        return this._objct.getMode();
     }
 }

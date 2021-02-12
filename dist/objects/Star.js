@@ -20,12 +20,14 @@ class Star extends Shape {
             let u3 = (x3 + sizeX) / (sizeX * 2);
             let v3 = (y3 + sizeY) / (sizeY * 2);
             this
-                .addTriangle(x1, y1, -sizeZ, u1, v1, x2, y2, -sizeZ, u2, v2, 0, 0, -sizeZ, u3, v3)
-                .addTriangle(x2, y2, -sizeZ, u2, v2, x1, y1, -sizeZ, u1, v1, x3, y3, 0, u3, v3)
+                .addTriangle(x1, y1, -sizeZ, u1, v1, x2, y2, -sizeZ, u2, v2, 0, 0, -sizeZ, 0.5, 0.5)
+                .addTriangle(x2, y2, -sizeZ, u2, v2, x1, y1, -sizeZ, u1, v1, x3, y3, -sizeZ, u3, v3)
                 .addTriangle(x2, y2, sizeZ, u2, v2, x1, y1, sizeZ, u1, v1, 0, 0, sizeZ, 0.5, 0.5)
-                .addTriangle(x1, y1, sizeZ, u1, v1, x2, y2, sizeZ, u2, v2, x3, y3, 0, u3, v3)
-                .addTriangle(x1, y1, -sizeZ, u1, v1, x1, y1, sizeZ, u1, v1, x3, y3, 0, u3, v3)
-                .addTriangle(x2, y2, sizeZ, u2, v2, x2, y2, -sizeZ, u2, v2, x3, y3, 0, u3, v3);
+                .addTriangle(x1, y1, sizeZ, u1, v1, x2, y2, sizeZ, u2, v2, x3, y3, sizeZ, u3, v3)
+                .addTriangle(x1, y1, -sizeZ, u1, v1, x1, y1, sizeZ, u1, v1, x3, y3, sizeZ, u3, v3)
+                .addTriangle(x3, y3, sizeZ, u3, v3, x3, y3, -sizeZ, u1, v1, x1, y1, -sizeZ, u1, v1)
+                .addTriangle(x2, y2, sizeZ, u2, v2, x2, y2, -sizeZ, u2, v2, x3, y3, sizeZ, u3, v3)
+                .addTriangle(x2, y2, -sizeZ, u2, v2, x3, y3, -sizeZ, u3, v3, x3, y3, sizeZ, u3, v3);
         }
         this.createBuffers();
     }

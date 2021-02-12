@@ -15,10 +15,11 @@ interface IShadowBuilder {
     rotateVectorX(vector: INumberList, angle: number): IShadowBuilder;
     rotateVectorY(vector: INumberList, angle: number): IShadowBuilder;
     rotateVectorZ(vector: INumberList, angle: number): IShadowBuilder;
-    update(lightLocation: INumberList, lightAngle: number, matrix: any, zoom: number): void;
+    update(lightLocation: INumberList, lightAngle: number, matrix: any, zoom: number): IShadowBuilder;
     createVolume(lightLocation: INumberList): void;
     render(): void;
     setAlpha(alpha: number): IShadowBuilder;
+    getMode(): number;
 }
 
 interface GlShadowBuilderOpts {
@@ -185,7 +186,7 @@ class GlShadowBuilder implements IShadowBuilder {
     /**
      * Update the shadow...
     **/
-    update(lightLocation: INumberList, lightAngle: number, matrix: any, zoom: number): void {
+    update(lightLocation: INumberList, lightAngle: number, matrix: any, zoom: number): IShadowBuilder {
         // Get the position of the light from the matrix, remove the zoom value...
         let sin, cos, x, y, z;
         let vector1 = vec3.fromValues(lightLocation[0], lightLocation[1], lightLocation[2]);
@@ -205,6 +206,7 @@ class GlShadowBuilder implements IShadowBuilder {
             .setupData()               // Reset all lists and buffers...
             .checkDirection(vector)    // Check which triangles face the light source...
             .findEdge();               // Find the edge...
+        return this;
     }
 
     /**
@@ -320,5 +322,9 @@ class GlShadowBuilder implements IShadowBuilder {
     setAlpha(alpha: number): IShadowBuilder {
         this._objct.setAlpha(alpha);
         return this;
+    }
+
+    getMode(): number {
+        return this._objct.getMode();
     }
 }

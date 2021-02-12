@@ -1,6 +1,45 @@
 declare var mat3: any;
 declare var mat4: any;
 
+/*
+        void main(void) {
+            float scale  = 0.01;
+            float angleX = aVertexPosition[0] + uAngleX;
+            float sinX   = sin(angleX * scale);
+            float cosX   = cos(angleX * scale);
+            float angleZ = aVertexPosition[2] + uAngleZ;
+            float sinZ   = sin(angleZ * scale);
+            float cosZ   = cos(angleZ * scale);
+
+            vec3 p0 = vec3(0, 50.0 + aVertexPosition[1] * 0.7, 0);
+            vec3 p1;
+            vec3 p2;
+
+            p1[1] = p0[1] * cosX - p0[2] * sinX;
+            p2[0] = p0[0] * cosZ - p1[1] * sinZ;
+            p2[1] = p0[0] * sinZ + p1[1] * cosZ - 50.0;
+            p2[2] = p0[1] * sinX + p0[2] * cosX;
+
+            if (uUsePolar) {
+                vec4 mvPosition = uMVMatrix * vec4(p2, 1.0);
+                gl_Position     = uPMatrix * mvPosition;
+                vTextureCoord1  = aTextureCoord1;
+                vTextureCoord2  = aTextureCoord2;
+                if (!uUseLighting) {
+                    vLightWeighting = vec3(0.4, 0.4, 0.4);
+                } else {
+                    vec3  lightDirection            = normalize(uLightingLocation - mvPosition.xyz);
+                    vec3  transformedNormal         = uNMatrix * aVertexNormal;
+                    float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);
+                    vLightWeighting = uAmbientColor + uLightingColor * directionalLightWeighting;
+                }
+            } else {
+                vTextureCoord1 = aTextureCoord1;
+                gl_Position    = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+            }
+            vColor = aVertexColor;
+*/
+
 const FRAGMENT_SHADER: string = `
         #ifdef GL_ES
         precision highp float;
@@ -93,14 +132,16 @@ const VERTEX_SHADER: string = `
         varying vec3 vEyeVec;
 
         void main(void) {
+            vec4 mvPosition;
+            vec4 vertex = vec4(aVertexPosition, 1.0);
             if (uMode == MODE_COLOR) {
-                gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-                vColor = aVertexColor;
+                gl_Position   = uPMatrix * uMVMatrix * vertex;
+                vColor        = aVertexColor;
             } else if (uMode == MODE_TEXTURE) {
-                gl_Position   = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+                gl_Position   = uPMatrix * uMVMatrix * vertex;
                 vTextureCoord = aTextureCoord;
             } else if (uMode == MODE_TEXTURE_FLAT) {
-                vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
+                mvPosition    = uMVMatrix * vertex;
                 gl_Position   = uPMatrix * mvPosition;
                 gl_Position.z += Z_ROUND_FIX;
                 vTextureCoord = aTextureCoord;
@@ -109,14 +150,14 @@ const VERTEX_SHADER: string = `
                 float directionalLightWeighting = max(dot(transformedNormal, lightDirection), 0.0);
                 vLightWeighting = uAmbientColor + uLightingColor * directionalLightWeighting;
             } else if (uMode == MODE_TEXTURE_PHONG) {
-                vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
+                mvPosition    = uMVMatrix * vertex;
                 gl_Position   = uPMatrix * mvPosition;
                 gl_Position.z += Z_ROUND_FIX;
                 vTextureCoord = aTextureCoord;
                 vNormal       = uNMatrix * aVertexNormal;
                 vEyeVec       = -vec3(mvPosition.xyz);
             } else if (uMode == MODE_TEXTURE_ALPHA) {
-                gl_Position   = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+                gl_Position   = uPMatrix * uMVMatrix * vertex;
                 vTextureCoord = aTextureCoord;
             }
         }

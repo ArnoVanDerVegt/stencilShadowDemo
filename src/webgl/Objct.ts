@@ -7,6 +7,7 @@ const MODE_TEXTURE_PHONG = 4.0;
 const MODE_TEXTURE_ALPHA = 5.0;
 
 interface IObjct {
+    _mode:                 number;
     _vertices:             IGlVertices;       // List of unique vertices of the object
     _verticesHash:         INumberHashMap;    // Hash list of vertices
     _vertexNormal:         INumberNumberList;
@@ -40,6 +41,8 @@ interface IObjct {
     getLines(): INumberList;
     getTriangles(): INumberList;
     setAlpha(alpha: number): IObjct;
+    getMode(): number;
+    render(): void;
 }
 
 interface IObjctOpts {
@@ -243,9 +246,7 @@ class Objct implements IObjct {
         }
         let renderer = this._renderer;
         let gl       = renderer.getGl();
-        gl.enable(gl.CULL_FACE);
         gl.enable(gl.DEPTH_TEST);
-        gl.cullFace(gl.BACK);
         gl.depthFunc(gl.LEQUAL);
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this._texture.getTexture());
@@ -253,9 +254,13 @@ class Objct implements IObjct {
         gl.uniform1f(renderer.getModeUniform(), this._mode);
         if (this._mode === MODE_TEXTURE_ALPHA) {
             gl.enable(gl.BLEND);
-            gl.depthMask(false);
+            // gl.depthMask(false);
             gl.uniform1f(renderer.getAlphaUniform(), this._alpha);
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            gl.disable(gl.CULL_FACE);
+        } else {
+            gl.enable(gl.CULL_FACE);
+            gl.cullFace(gl.BACK);
         }
         renderer.setMatrixUniforms();
         this._colorBuffer.disable();
@@ -282,5 +287,9 @@ class Objct implements IObjct {
     setAlpha(alpha: number): IObjct {
         this._alpha = alpha;
         return this;
+    }
+
+    getMode(): number {
+        return this._mode;
     }
 }
