@@ -52,7 +52,7 @@ class Texture implements ITexture {
         this._renderer  = opts.renderer;
         this._color1    = opts.color1;
         this._color2    = opts.color2;
-        this._src       = opts.src || '';
+        this._src       = opts.src       || '';
         this._magFilter = opts.magFilter || gl.LINEAR;
         this._minFilter = opts.minFilter || gl.LINEAR_MIPMAP_NEAREST;
         this._ready     = false;
