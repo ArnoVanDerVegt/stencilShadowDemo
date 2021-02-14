@@ -15,13 +15,6 @@
 **/
 
 interface ITexture {
-    _renderer: IRenderer;
-    _texture:  IGlTexture;
-    _canvas:   any;
-    _color1:   string;
-    _color2:   string;
-    _src:      string;
-    _ready:    boolean;
     getReady(): boolean;
     getTexture(): IGlTexture;
 }

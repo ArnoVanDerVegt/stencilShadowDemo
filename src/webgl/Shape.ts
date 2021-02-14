@@ -1,5 +1,4 @@
 interface IShape extends IObjct {
-    _shadow: IShadowBuilder;
     getShadow(): IShadowBuilder;
     setShadow(shadow: IShadowBuilder): void;
     createObject(sizeX: number, sizeY: number, sizeZ: number): void;

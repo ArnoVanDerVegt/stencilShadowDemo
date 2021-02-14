@@ -1,10 +1,4 @@
 interface IFontCharacter {
-    _renderer:           IRenderer;
-    _colorBuffer:        IBuffer;
-    _normalBuffer:       IBuffer;
-    _positionBuffer:     IBuffer;
-    _textureCoordBuffer: IBuffer;
-    _indexBuffer:        IBuffer;
     render(): void;
 }
 

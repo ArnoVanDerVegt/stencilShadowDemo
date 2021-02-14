@@ -12,13 +12,6 @@ interface IFontCharacterList {
 }
 
 interface IFontCharacters {
-    _renderer:   IRenderer;
-    _texture:    ITexture;
-    _characters: IFontCharacterList;
-    _halign:     number;
-    _valign:     number;
-    _scaleX:     number;
-    _scaleY:     number;
     setHAlign(halign: number): IFontCharacters;
     setVAlign(valign: number): IFontCharacters;
     setScaleX(scaleX: number): IFontCharacters;

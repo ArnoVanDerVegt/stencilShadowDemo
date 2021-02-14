@@ -7,13 +7,6 @@ interface IShapeList {
 }
 
 interface IEngine {
-    _renderer:       IRenderer;
-    _shapeList:      IShapeList;
-    _shapeInstances: IAnyList;
-    _shadowOverlay:  IShadowOverlay;
-    _light:          ILight;
-    _lastTime:       number;
-    _zoom:           number;
     addShape(shape: IShape, shadow: boolean): IEngine;
     renderShapeInstances(types: INumberList): IEngine;
     renderShadows(): void;

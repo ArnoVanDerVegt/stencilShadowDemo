@@ -14,26 +14,6 @@ enum VertexMode {
 }
 
 interface IObjct {
-    _colorMode:            number;
-    _vertices:             IGlVertices;       // List of unique vertices of the object
-    _verticesHash:         INumberHashMap;    // Hash list of vertices
-    _vertexNormal:         INumberNumberList;
-    _lines:                INumberList;       // List of lines in both directions...
-    _linesUnique:          INumberList;       // A list of unique lines
-    _triangles:            INumberList;       // Triangles in the object
-    _renderer:             IRenderer;
-    _texture:              ITexture;
-    _glVertexCount:        number;            // The active vertex index
-    _glVertices:           INumberList;       // Vertex position list for gl
-    _glNormals:            INumberList;       // Normal list for gl
-    _glIndices:            INumberList;       // Index list for gl
-    _glTextureCoords:      INumberList;       // Texture cooordinate list for gl
-    _colorBuffer:          IBuffer;
-    _positionBuffer:       IBuffer;
-    _normalBuffer:         IBuffer;
-    _textureCoordBuffer:   IBuffer;
-    _indexBuffer:          IBuffer;
-    _alpha:                number;
     addVertex(x: number, y: number, z: number): number;
     addGLVertex(x: number, y: number, z: number, u: number, v: number): number;
     addNormal(normal: unknown): IObjct;

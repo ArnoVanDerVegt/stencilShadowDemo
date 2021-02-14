@@ -155,26 +155,6 @@ interface IGlMatrixList {
 }
 
 interface IRenderer {
-    _screenWidth:             number;
-    _screenHeight:            number;
-    _viewportWidth:           number;
-    _viewportHeight:          number;
-    _colorModeUniform:        number;
-    _waterOffsetUniform:      number;
-    _alphaUniform:            number;
-    _samplerUniform:          number;
-    _lightingLocationUniform: number;
-    _lightingColorUniform:    number;
-    _ambientColorUniform:     number;
-    _pMatrixUniform:          number;
-    _mvMatrixUniform:         number;
-    _nMatrixUniform:          number;
-    _mvMatrix:                INumberList;
-    _mvMatrixStack:           IGlMatrixList;
-    _pMatrix:                 INumberList;
-    _pMatrixStack:            IGlMatrixList;
-    _gl:                      IGl;
-    _shaderProgram:           IGlShaderProgram;
     getGl(): IGl;
     getMvMatrix(): INumberList;
     setMvMatrix(mvMatrix: INumberList): void;

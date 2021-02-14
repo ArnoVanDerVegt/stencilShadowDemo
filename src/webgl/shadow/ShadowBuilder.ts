@@ -1,12 +1,4 @@
 interface IShadowBuilder {
-    _renderer:            IRenderer;
-    _lineSides:           IAnyList;
-    _objct:               IObjct;
-    _glPositionBuffer:    IGlBuffer;
-    _glVertexIndexBuffer: IGlBuffer;
-    _glVertices:          INumberList;
-    _glIndices:           INumberList;
-    _lightLocation:       INumberList;
     setupData(): IShadowBuilder;
     addGLVertex(vector: INumberList): IShadowBuilder;
     addShadowSide(vector1: INumberList, vector2: INumberList, vector3: INumberList, vector4: INumberList): void;

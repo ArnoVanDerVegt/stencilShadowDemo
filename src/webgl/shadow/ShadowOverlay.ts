@@ -1,12 +1,6 @@
 declare var vec3: any;
 
 interface IShadowOverlay {
-    _renderer:           IRenderer;
-    _positionBuffer:     IBuffer;
-    _colorBuffer:        IBuffer;
-    _textureCoordBuffer: IBuffer;
-    _normalBuffer:       IBuffer;
-    _indexBuffer:        IBuffer;
     render(): void;
 }
 

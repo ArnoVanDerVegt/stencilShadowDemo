@@ -1,9 +1,6 @@
 declare var mat4: any;
 
 interface ILight {
-    _cube:     IShape;
-    _location: INumberList;
-    _renderer: IRenderer;
     update(angle: number): void;
     getLocation(): INumberList;
 }
