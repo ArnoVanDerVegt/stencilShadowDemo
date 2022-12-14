@@ -3,7 +3,7 @@
   "version": "0.9.1",
   "dependencies": {},
   "devDependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.3"
   },
   "scripts": {},
   "engines": {
